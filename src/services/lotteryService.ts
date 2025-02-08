@@ -18,7 +18,11 @@ export const generateLotteryNumbers = async (
     });
 
     if (error) {
-      throw error;
+      throw new Error(error.message);
+    }
+
+    if (!data || !data.generatedText) {
+      throw new Error("Failed to generate numbers");
     }
 
     const numbers = JSON.parse(data.generatedText);
@@ -27,4 +31,4 @@ export const generateLotteryNumbers = async (
     console.error("Error generating lottery numbers:", error);
     throw error;
   }
-}
+};
