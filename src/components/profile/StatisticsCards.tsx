@@ -18,7 +18,7 @@ export const StatisticsCards = ({ winRate }: StatisticsCardsProps) => {
       <Card>
         <CardHeader>
           <CardTitle>Total Plays</CardTitle>
-          <CardDescription>Your lottery activity</CardDescription>
+          <CardDescription>Numbers marked as used</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-3xl font-bold">{winRate?.total_plays || 0}</div>
@@ -27,7 +27,7 @@ export const StatisticsCards = ({ winRate }: StatisticsCardsProps) => {
       <Card>
         <CardHeader>
           <CardTitle>Win Rate</CardTitle>
-          <CardDescription>Success percentage</CardDescription>
+          <CardDescription>Success percentage of used numbers</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-3xl font-bold text-green-600">
@@ -38,7 +38,7 @@ export const StatisticsCards = ({ winRate }: StatisticsCardsProps) => {
       <Card>
         <CardHeader>
           <CardTitle>Total Earnings</CardTitle>
-          <CardDescription>Prize money won</CardDescription>
+          <CardDescription>Prize money from winning numbers</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-3xl font-bold text-green-600">

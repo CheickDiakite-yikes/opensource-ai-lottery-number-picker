@@ -31,7 +31,14 @@ export const useWinRate = () => {
         throw error;
       }
 
-      return (data as WinRate[])[0];
+      // Convert bigint to number for frontend use
+      const result = data[0];
+      return {
+        total_plays: Number(result.total_plays),
+        total_wins: Number(result.total_wins),
+        win_rate: Number(result.win_rate),
+        total_earnings: Number(result.total_earnings),
+      } as WinRate;
     },
   });
 };

@@ -126,6 +126,15 @@ export type Database = {
         }
         Returns: boolean
       }
+      check_lottery_match: {
+        Args: {
+          lottery_numbers: number[]
+          lottery_special_number: number
+          winning_numbers: number[]
+          winning_special_number: number
+        }
+        Returns: boolean
+      }
       cleanup_old_lottery_history: {
         Args: Record<PropertyKey, never>
         Returns: undefined
