@@ -109,6 +109,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_win_rate: {
+        Args: {
+          user_id_param: string
+        }
+        Returns: {
+          total_plays: number
+          total_wins: number
+          win_rate: number
+          total_earnings: number
+        }[]
+      }
       can_generate_numbers: {
         Args: {
           user_id: string
@@ -118,6 +129,15 @@ export type Database = {
       cleanup_old_lottery_history: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      most_common_numbers: {
+        Args: {
+          game_type_param: string
+        }
+        Returns: {
+          number: number
+          frequency: number
+        }[]
       }
       reset_monthly_generations: {
         Args: Record<PropertyKey, never>
