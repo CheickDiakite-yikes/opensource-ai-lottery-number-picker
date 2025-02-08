@@ -29,14 +29,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 const AppRoutes = () => (
   <Routes>
-    <Route
-      path="/"
-      element={
-        <ProtectedRoute>
-          <Index />
-        </ProtectedRoute>
-      }
-    />
+    <Route path="/" element={<Index />} />
     <Route path="/auth" element={<Auth />} />
     <Route
       path="/profile"

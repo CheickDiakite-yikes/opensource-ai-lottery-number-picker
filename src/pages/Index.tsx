@@ -6,30 +6,59 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/components/AuthProvider";
 import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 
 const Index = () => {
   const { toast } = useToast();
   const { session } = useAuth();
+  const navigate = useNavigate();
+
+  const { data: monthlyGenerations } = useQuery({
+    queryKey: ["monthly-generations"],
+    queryFn: async () => {
+      if (!session?.user) return null;
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("monthly_generations")
+        .eq("id", session.user.id)
+        .single();
+      
+      if (error) throw error;
+      return data.monthly_generations;
+    },
+    enabled: !!session?.user,
+  });
 
   const handleGenerate = async (type: "powerball" | "megamillions") => {
+    // For unauthenticated users, just generate numbers without saving
     if (!session?.user) {
+      const numbers = await generateLotteryNumbers(type);
+      return numbers;
+    }
+
+    // For authenticated users, check monthly limit and save to history
+    if (monthlyGenerations >= 20) {
       toast({
-        title: "Error",
-        description: "You must be logged in to generate numbers",
+        title: "Monthly Limit Reached",
+        description: "You've reached your limit of 20 generations this month. Please try again next month.",
         variant: "destructive",
       });
-      return;
+      return [];
     }
 
     const numbers = await generateLotteryNumbers(type);
     
     try {
-      await supabase.from("lottery_history").insert({
+      const { error } = await supabase.from("lottery_history").insert({
         numbers: numbers.slice(0, -1),
         special_number: numbers[numbers.length - 1],
         game_type: type,
         user_id: session.user.id
       });
+
+      if (error) throw error;
     } catch (error) {
       console.error("Error saving numbers:", error);
       toast({
@@ -55,9 +84,27 @@ const Index = () => {
             <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-lottery-powerball to-lottery-megamillions bg-clip-text text-transparent">
               AI Lottery Number Generator
             </h1>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-gray-600 mb-8">
               Generate your lucky numbers using advanced AI predictions
             </p>
+            {!session?.user && (
+              <div className="max-w-2xl mx-auto bg-white p-6 rounded-xl shadow-lg">
+                <p className="text-gray-600 mb-4">
+                  Try it out for free! Sign up to save your numbers and get up to 20 generations per month.
+                </p>
+                <Button 
+                  onClick={() => navigate("/auth")}
+                  className="bg-gradient-to-r from-lottery-powerball to-lottery-megamillions text-white"
+                >
+                  Sign Up Now
+                </Button>
+              </div>
+            )}
+            {session?.user && monthlyGenerations !== null && (
+              <p className="text-sm text-gray-600 mt-4">
+                Monthly Generations: {monthlyGenerations}/20
+              </p>
+            )}
           </motion.div>
 
           <div className="grid gap-8 md:grid-cols-2">

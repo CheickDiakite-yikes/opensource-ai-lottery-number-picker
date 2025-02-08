@@ -51,14 +51,20 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          last_generation_reset: string | null
+          monthly_generations: number | null
         }
         Insert: {
           created_at?: string
           id: string
+          last_generation_reset?: string | null
+          monthly_generations?: number | null
         }
         Update: {
           created_at?: string
           id?: string
+          last_generation_reset?: string | null
+          monthly_generations?: number | null
         }
         Relationships: []
       }
@@ -67,7 +73,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_generate_numbers: {
+        Args: {
+          user_id: string
+        }
+        Returns: boolean
+      }
       cleanup_old_lottery_history: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      reset_monthly_generations: {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
