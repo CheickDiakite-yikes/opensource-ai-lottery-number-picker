@@ -14,6 +14,7 @@ export type Database = {
           created_at: string
           game_type: string
           id: string
+          is_used: boolean | null
           numbers: number[]
           special_number: number
           user_id: string
@@ -22,6 +23,7 @@ export type Database = {
           created_at?: string
           game_type: string
           id?: string
+          is_used?: boolean | null
           numbers: number[]
           special_number: number
           user_id: string
@@ -30,6 +32,7 @@ export type Database = {
           created_at?: string
           game_type?: string
           id?: string
+          is_used?: boolean | null
           numbers?: number[]
           special_number?: number
           user_id?: string
@@ -64,7 +67,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      cleanup_old_lottery_history: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
