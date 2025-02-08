@@ -1,6 +1,6 @@
 
 import { motion, AnimatePresence } from "framer-motion";
-import { LotteryNumber } from "./LotteryNumber";
+import { LotteryNumber } from "@/components/lottery/LotteryNumber";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface LotteryNumbersProps {
@@ -43,3 +43,4 @@ export const LotteryNumbers = ({ numbers, isGenerating, isPowerball }: LotteryNu
     </AnimatePresence>
   );
 };
+

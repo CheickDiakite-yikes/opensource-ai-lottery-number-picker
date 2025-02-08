@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Share2, Wand2 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface LotteryButtonsProps {
   numbers: number[];
@@ -94,3 +94,4 @@ export const LotteryButtons = ({
     </div>
   );
 };
+
