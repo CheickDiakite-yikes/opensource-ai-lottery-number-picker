@@ -8,6 +8,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { SparklesIcon, Target, ChartBarIcon, DollarSign } from "lucide-react";
 
 const Index = () => {
   const { toast } = useToast();
@@ -80,40 +81,67 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-16"
           >
-            <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-lottery-powerball to-lottery-megamillions bg-clip-text text-transparent">
+            <h1 className="text-6xl font-bold mb-6 bg-gradient-to-r from-lottery-powerball via-purple-500 to-lottery-megamillions bg-clip-text text-transparent">
               AI Lottery Number Generator
             </h1>
-            <p className="text-xl text-gray-600 mb-4">
-              Generate your lucky numbers using advanced AI predictions
+            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+              Harness the power of artificial intelligence to generate your lucky numbers. Try it now for free!
             </p>
             {!session?.user ? (
-              <div className="max-w-2xl mx-auto space-y-4 mb-8">
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                  <h2 className="text-lg font-semibold mb-4 text-gray-800">
-                    Try it for free, then unlock more with a free account!
+              <div className="max-w-4xl mx-auto mb-12">
+                <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg border border-gray-100">
+                  <h2 className="text-2xl font-semibold mb-8 text-gray-800 bg-gradient-to-r from-lottery-powerball to-lottery-megamillions bg-clip-text text-transparent">
+                    Unlock the Full Potential of AI Predictions
                   </h2>
-                  <ul className="text-gray-600 space-y-2 text-left list-none mb-4">
-                    <li className="flex items-center">
-                      <span className="mr-2">✨</span>
-                      Generate numbers without an account
-                    </li>
-                    <li className="flex items-center">
-                      <span className="mr-2">🎯</span>
-                      Sign up to get 20 AI-powered generations per month
-                    </li>
-                    <li className="flex items-center">
-                      <span className="mr-2">📊</span>
-                      Track your numbers and view detailed analytics
-                    </li>
-                    <li className="flex items-center">
-                      <span className="mr-2">💰</span>
-                      Monitor your wins and track your earnings
-                    </li>
-                  </ul>
+                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <motion.div 
+                      whileHover={{ scale: 1.05 }}
+                      className="p-6 rounded-xl bg-gradient-to-br from-white to-gray-50 shadow-sm border border-gray-100"
+                    >
+                      <div className="mb-4">
+                        <SparklesIcon className="h-8 w-8 text-lottery-powerball mx-auto" />
+                      </div>
+                      <h3 className="font-medium mb-2">Free Generation</h3>
+                      <p className="text-sm text-gray-600">Try our AI generator without an account</p>
+                    </motion.div>
+
+                    <motion.div 
+                      whileHover={{ scale: 1.05 }}
+                      className="p-6 rounded-xl bg-gradient-to-br from-white to-gray-50 shadow-sm border border-gray-100"
+                    >
+                      <div className="mb-4">
+                        <Target className="h-8 w-8 text-lottery-megamillions mx-auto" />
+                      </div>
+                      <h3 className="font-medium mb-2">20 Monthly Generations</h3>
+                      <p className="text-sm text-gray-600">Get AI-powered predictions every month</p>
+                    </motion.div>
+
+                    <motion.div 
+                      whileHover={{ scale: 1.05 }}
+                      className="p-6 rounded-xl bg-gradient-to-br from-white to-gray-50 shadow-sm border border-gray-100"
+                    >
+                      <div className="mb-4">
+                        <ChartBarIcon className="h-8 w-8 text-purple-500 mx-auto" />
+                      </div>
+                      <h3 className="font-medium mb-2">Advanced Analytics</h3>
+                      <p className="text-sm text-gray-600">Track numbers and view insights</p>
+                    </motion.div>
+
+                    <motion.div 
+                      whileHover={{ scale: 1.05 }}
+                      className="p-6 rounded-xl bg-gradient-to-br from-white to-gray-50 shadow-sm border border-gray-100"
+                    >
+                      <div className="mb-4">
+                        <DollarSign className="h-8 w-8 text-green-500 mx-auto" />
+                      </div>
+                      <h3 className="font-medium mb-2">Win Tracking</h3>
+                      <p className="text-sm text-gray-600">Monitor your wins and earnings</p>
+                    </motion.div>
+                  </div>
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-gray-600 mt-4">
+              <p className="text-sm text-gray-600 mt-4 mb-12">
                 Monthly Generations: {monthlyGenerations}/20
               </p>
             )}
