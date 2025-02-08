@@ -43,6 +43,7 @@ interface LotteryNumber {
   is_used: boolean;
   is_winner: boolean;
   prize_amount: number | null;
+  checked_at: string | null;
 }
 
 interface WinRate {
@@ -98,7 +99,8 @@ export default function Profile() {
         throw error;
       }
 
-      return data as WinRate;
+      // Take the first item from the array as it returns a single row
+      return (data as WinRate[])[0];
     },
   });
 
