@@ -5,7 +5,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Lock, Mail } from "lucide-react";
+import { Mail, Lock, Info, ArrowLeft } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
@@ -28,15 +39,19 @@ const Auth = () => {
 
       if (!isLogin) {
         toast({
-          title: "Success!",
+          title: "Welcome aboard! 🎉",
           description: "Please check your email to verify your account.",
         });
       } else {
+        toast({
+          title: "Welcome back! 🎮",
+          description: "Successfully logged in.",
+        });
         navigate("/");
       }
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: "Oops! Something went wrong",
         description: error.message,
         variant: "destructive",
       });
@@ -46,57 +61,116 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-lottery-background flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="bg-lottery-card backdrop-blur-md rounded-2xl p-8 shadow-xl animate-fade-in">
-          <h2 className="text-3xl font-bold text-center mb-6">
-            {isLogin ? "Welcome Back" : "Create Account"}
-          </h2>
-          <form onSubmit={handleAuth} className="space-y-6">
-            <div className="space-y-4">
-              <div className="relative">
-                <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                <Input
-                  type="email"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10"
-                  required
-                />
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 flex flex-col items-center justify-center p-4">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-md space-y-6"
+      >
+        <Button
+          variant="ghost"
+          className="flex items-center gap-2"
+          onClick={() => navigate("/")}
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Home
+        </Button>
+
+        <Card className="w-full backdrop-blur-lg bg-white/90 shadow-xl">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl font-bold text-center">
+              {isLogin ? "Welcome Back" : "Create Account"}
+            </CardTitle>
+            <CardDescription className="text-center">
+              {isLogin
+                ? "Enter your credentials to access your account"
+                : "Sign up to save your numbers and get 20 generations per month"}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleAuth} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
+                </div>
               </div>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                <Input
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10"
-                  required
-                />
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={loading ? "loading" : "button"}
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Button
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-lottery-powerball to-lottery-megamillions text-white"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <div className="flex items-center gap-2">
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                        <span>{isLogin ? "Signing in..." : "Creating account..."}</span>
+                      </div>
+                    ) : (
+                      <span>{isLogin ? "Sign In" : "Create Account"}</span>
+                    )}
+                  </Button>
+                </motion.div>
+              </AnimatePresence>
+            </form>
+          </CardContent>
+          <CardFooter className="flex flex-col space-y-4">
+            <div className="relative w-full">
+              <Separator className="my-4" />
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-2 text-sm text-gray-500">
+                or
               </div>
             </div>
             <Button
-              type="submit"
-              className="w-full bg-gradient-to-r from-lottery-powerball to-lottery-megamillions text-white"
-              disabled={loading}
-            >
-              {loading ? "Processing..." : isLogin ? "Sign In" : "Sign Up"}
-            </Button>
-          </form>
-          <div className="mt-6 text-center">
-            <button
+              type="button"
+              variant="outline"
+              className="w-full"
               onClick={() => setIsLogin(!isLogin)}
-              className="text-sm text-gray-600 hover:text-gray-800"
             >
-              {isLogin
-                ? "Don't have an account? Sign Up"
-                : "Already have an account? Sign In"}
-            </button>
-          </div>
-        </div>
-      </div>
+              {isLogin ? "Create a new account" : "Sign in to existing account"}
+            </Button>
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <Info className="h-4 w-4" />
+              <span>
+                {isLogin
+                  ? "Don't have an account yet? Create one to save your numbers."
+                  : "Already have an account? Sign in to access your saved numbers."}
+              </span>
+            </div>
+          </CardFooter>
+        </Card>
+      </motion.div>
     </div>
   );
 };
