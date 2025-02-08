@@ -1,11 +1,10 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, Lock, Info, ArrowLeft, GitHub, Chrome } from "lucide-react";
+import { Mail, Lock, Info, ArrowLeft, Chrome, Github } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Card,
@@ -159,7 +158,7 @@ const Auth = () => {
                 className="w-full"
                 onClick={() => handleSocialLogin('github')}
               >
-                <GitHub className="h-4 w-4 mr-2" />
+                <Github className="h-4 w-4 mr-2" />
                 GitHub
               </Button>
             </div>
