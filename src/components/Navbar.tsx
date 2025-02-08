@@ -34,7 +34,7 @@ export const Navbar = () => {
               </Link>
             )}
           </div>
-          {session && (
+          {session ? (
             <Button
               onClick={handleSignOut}
               variant="ghost"
@@ -42,6 +42,13 @@ export const Navbar = () => {
             >
               <LogOut className="h-4 w-4" />
               Sign Out
+            </Button>
+          ) : (
+            <Button 
+              onClick={() => navigate("/auth")}
+              className="bg-gradient-to-r from-lottery-powerball to-lottery-megamillions text-white"
+            >
+              Sign Up Now
             </Button>
           )}
         </div>

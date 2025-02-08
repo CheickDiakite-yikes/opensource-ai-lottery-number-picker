@@ -6,7 +6,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/components/AuthProvider";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
@@ -87,19 +86,6 @@ const Index = () => {
             <p className="text-xl text-gray-600 mb-8">
               Generate your lucky numbers using advanced AI predictions
             </p>
-            {!session?.user && (
-              <div className="max-w-2xl mx-auto bg-white p-6 rounded-xl shadow-lg">
-                <p className="text-gray-600 mb-4">
-                  Try it out for free! Sign up to save your numbers and get up to 20 generations per month.
-                </p>
-                <Button 
-                  onClick={() => navigate("/auth")}
-                  className="bg-gradient-to-r from-lottery-powerball to-lottery-megamillions text-white"
-                >
-                  Sign Up Now
-                </Button>
-              </div>
-            )}
             {session?.user && monthlyGenerations !== null && (
               <p className="text-sm text-gray-600 mt-4">
                 Monthly Generations: {monthlyGenerations}/20
