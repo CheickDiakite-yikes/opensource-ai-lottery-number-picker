@@ -11,29 +11,38 @@ export type Database = {
     Tables: {
       lottery_history: {
         Row: {
+          checked_at: string | null
           created_at: string
           game_type: string
           id: string
           is_used: boolean | null
+          is_winner: boolean | null
           numbers: number[]
+          prize_amount: number | null
           special_number: number
           user_id: string
         }
         Insert: {
+          checked_at?: string | null
           created_at?: string
           game_type: string
           id?: string
           is_used?: boolean | null
+          is_winner?: boolean | null
           numbers: number[]
+          prize_amount?: number | null
           special_number: number
           user_id: string
         }
         Update: {
+          checked_at?: string | null
           created_at?: string
           game_type?: string
           id?: string
           is_used?: boolean | null
+          is_winner?: boolean | null
           numbers?: number[]
+          prize_amount?: number | null
           special_number?: number
           user_id?: string
         }
@@ -65,6 +74,33 @@ export type Database = {
           id?: string
           last_generation_reset?: string | null
           monthly_generations?: number | null
+        }
+        Relationships: []
+      }
+      winning_numbers: {
+        Row: {
+          created_at: string
+          draw_date: string
+          game_type: string
+          id: string
+          numbers: number[]
+          special_number: number
+        }
+        Insert: {
+          created_at?: string
+          draw_date: string
+          game_type: string
+          id?: string
+          numbers: number[]
+          special_number: number
+        }
+        Update: {
+          created_at?: string
+          draw_date?: string
+          game_type?: string
+          id?: string
+          numbers?: number[]
+          special_number?: number
         }
         Relationships: []
       }
