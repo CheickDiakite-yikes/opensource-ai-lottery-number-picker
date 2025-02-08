@@ -3,7 +3,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { LotteryNumber } from "./LotteryNumber";
 import { Button } from "@/components/ui/button";
-import { Star } from "lucide-react";
+import { Star, Wand2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface LotteryCardProps {
@@ -81,28 +81,75 @@ export const LotteryCard = ({
         )}
       </AnimatePresence>
 
-      <Button
-        onClick={handleGenerate}
-        disabled={isGenerating}
-        className={`w-full h-12 text-lg font-semibold transition-all duration-300 ${
-          isPowerball 
-            ? "bg-lottery-powerball hover:bg-lottery-powerball/90 shadow-lg shadow-lottery-powerball/30" 
-            : "bg-lottery-megamillions hover:bg-lottery-megamillions/90 shadow-lg shadow-lottery-megamillions/30"
-        } text-white`}
-      >
-        {isGenerating ? (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex items-center gap-2"
-          >
-            <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            <span>Generating...</span>
-          </motion.div>
-        ) : (
-          "Generate Numbers"
-        )}
-      </Button>
+      <div className="space-y-4">
+        <Button
+          onClick={handleGenerate}
+          disabled={isGenerating}
+          className={`w-full h-12 text-lg font-semibold transition-all duration-300 ${
+            isPowerball 
+              ? "bg-lottery-powerball hover:bg-lottery-powerball/90 shadow-lg shadow-lottery-powerball/30" 
+              : "bg-lottery-megamillions hover:bg-lottery-megamillions/90 shadow-lg shadow-lottery-megamillions/30"
+          } text-white`}
+        >
+          {isGenerating ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex items-center gap-2"
+            >
+              <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              <span>Generating...</span>
+            </motion.div>
+          ) : (
+            "Generate Numbers"
+          )}
+        </Button>
+
+        <AnimatePresence>
+          {numbers.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+            >
+              <Button
+                onClick={handleGenerate}
+                disabled={isGenerating}
+                variant="outline"
+                className="w-full h-12 text-lg font-semibold border-2 group"
+              >
+                {isGenerating ? (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex items-center gap-2"
+                  >
+                    <span className="inline-block w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                    <span>Regenerating...</span>
+                  </motion.div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <motion.div
+                      animate={{ 
+                        rotate: [0, 14, -8, 14, -4, 10, 0],
+                        scale: [1, 1.1, 1]
+                      }}
+                      transition={{
+                        duration: 1,
+                        repeat: Infinity,
+                        repeatDelay: 2
+                      }}
+                    >
+                      <Wand2 className="w-5 h-5" />
+                    </motion.div>
+                    <span>Regenerate Numbers</span>
+                  </div>
+                )}
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </motion.div>
   );
 };
