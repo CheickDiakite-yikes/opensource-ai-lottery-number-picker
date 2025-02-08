@@ -4,11 +4,22 @@ import { generateLotteryNumbers } from "@/services/lotteryService";
 import { Navbar } from "@/components/Navbar";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/components/AuthProvider";
 
 const Index = () => {
   const { toast } = useToast();
+  const { session } = useAuth();
 
   const handleGenerate = async (type: "powerball" | "megamillions") => {
+    if (!session?.user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to generate numbers",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const numbers = await generateLotteryNumbers(type);
     
     try {
@@ -16,9 +27,20 @@ const Index = () => {
         numbers: numbers.slice(0, -1),
         special_number: numbers[numbers.length - 1],
         game_type: type,
+        user_id: session.user.id
+      });
+
+      toast({
+        title: "Success",
+        description: "Your numbers have been saved!",
       });
     } catch (error) {
       console.error("Error saving numbers:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save your numbers",
+        variant: "destructive",
+      });
     }
     
     return numbers;
