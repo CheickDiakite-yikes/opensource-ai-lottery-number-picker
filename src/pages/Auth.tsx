@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, Lock, Info, ArrowLeft } from "lucide-react";
+import { Mail, Lock, Info, ArrowLeft, GitHub, Chrome } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Card,
@@ -15,6 +15,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 
@@ -60,6 +66,32 @@ const Auth = () => {
     }
   };
 
+  const handleSocialLogin = async (provider: 'google' | 'github') => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: window.location.origin,
+        },
+      });
+      
+      if (error) throw error;
+    } catch (error: any) {
+      toast({
+        title: "Social login failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const benefits = [
+    "Save your lucky numbers",
+    "Track your winning history",
+    "Get 20 generations per month",
+    "Access statistics and insights",
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 flex flex-col items-center justify-center p-4">
       <motion.div 
@@ -84,10 +116,61 @@ const Auth = () => {
             <CardDescription className="text-center">
               {isLogin
                 ? "Enter your credentials to access your account"
-                : "Sign up to save your numbers and get 20 generations per month"}
+                : "Join us to unlock premium features and more!"}
             </CardDescription>
+            {!isLogin && (
+              <motion.div 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-4 p-4 bg-gray-50 rounded-lg"
+              >
+                <h4 className="text-sm font-medium mb-2">Benefits of joining:</h4>
+                <ul className="space-y-2">
+                  {benefits.map((benefit, index) => (
+                    <motion.li
+                      key={index}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="flex items-center text-sm text-gray-600"
+                    >
+                      <div className="h-1.5 w-1.5 rounded-full bg-green-500 mr-2" />
+                      {benefit}
+                    </motion.li>
+                  ))}
+                </ul>
+              </motion.div>
+            )}
           </CardHeader>
           <CardContent>
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => handleSocialLogin('google')}
+              >
+                <Chrome className="h-4 w-4 mr-2" />
+                Google
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => handleSocialLogin('github')}
+              >
+                <GitHub className="h-4 w-4 mr-2" />
+                GitHub
+              </Button>
+            </div>
+            
+            <div className="relative mb-6">
+              <Separator />
+              <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-2 text-sm text-gray-500">
+                or continue with email
+              </span>
+            </div>
+
             <form onSubmit={handleAuth} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
@@ -146,28 +229,31 @@ const Auth = () => {
             </form>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
-            <div className="relative w-full">
-              <Separator className="my-4" />
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-2 text-sm text-gray-500">
-                or
-              </div>
-            </div>
             <Button
               type="button"
-              variant="outline"
+              variant="ghost"
               className="w-full"
               onClick={() => setIsLogin(!isLogin)}
             >
               {isLogin ? "Create a new account" : "Sign in to existing account"}
             </Button>
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <Info className="h-4 w-4" />
-              <span>
-                {isLogin
-                  ? "Don't have an account yet? Create one to save your numbers."
-                  : "Already have an account? Sign in to access your saved numbers."}
-              </span>
-            </div>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <Info className="h-4 w-4" />
+                    <span>
+                      {isLogin
+                        ? "Don't have an account yet? Create one to save your numbers."
+                        : "Already have an account? Sign in to access your saved numbers."}
+                    </span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Get access to premium features and save your lucky numbers!</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </CardFooter>
         </Card>
       </motion.div>
