@@ -5,6 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/components/AuthProvider";
+import { motion } from "framer-motion";
 
 const Index = () => {
   const { toast } = useToast();
@@ -29,11 +30,6 @@ const Index = () => {
         game_type: type,
         user_id: session.user.id
       });
-
-      toast({
-        title: "Success",
-        description: "Your numbers have been saved!",
-      });
     } catch (error) {
       console.error("Error saving numbers:", error);
       toast({
@@ -47,18 +43,22 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-lottery-background">
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <Navbar />
-      <div className="p-4 sm:p-6 md:p-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-lottery-powerball to-lottery-megamillions bg-clip-text text-transparent">
+      <div className="px-4 sm:px-6 md:px-8 py-12">
+        <div className="max-w-6xl mx-auto">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-16"
+          >
+            <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-lottery-powerball to-lottery-megamillions bg-clip-text text-transparent">
               AI Lottery Number Generator
             </h1>
-            <p className="text-gray-600">
+            <p className="text-xl text-gray-600">
               Generate your lucky numbers using advanced AI predictions
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid gap-8 md:grid-cols-2">
             <LotteryCard
