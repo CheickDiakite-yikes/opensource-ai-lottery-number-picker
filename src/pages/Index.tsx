@@ -83,10 +83,36 @@ const Index = () => {
             <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-lottery-powerball to-lottery-megamillions bg-clip-text text-transparent">
               AI Lottery Number Generator
             </h1>
-            <p className="text-xl text-gray-600 mb-8">
+            <p className="text-xl text-gray-600 mb-4">
               Generate your lucky numbers using advanced AI predictions
             </p>
-            {session?.user && monthlyGenerations !== null && (
+            {!session?.user ? (
+              <div className="max-w-2xl mx-auto space-y-4 mb-8">
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                  <h2 className="text-lg font-semibold mb-4 text-gray-800">
+                    Try it for free, then unlock more with a free account!
+                  </h2>
+                  <ul className="text-gray-600 space-y-2 text-left list-none mb-4">
+                    <li className="flex items-center">
+                      <span className="mr-2">✨</span>
+                      Generate numbers without an account
+                    </li>
+                    <li className="flex items-center">
+                      <span className="mr-2">🎯</span>
+                      Sign up to get 20 AI-powered generations per month
+                    </li>
+                    <li className="flex items-center">
+                      <span className="mr-2">📊</span>
+                      Track your numbers and view detailed analytics
+                    </li>
+                    <li className="flex items-center">
+                      <span className="mr-2">💰</span>
+                      Monitor your wins and track your earnings
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            ) : (
               <p className="text-sm text-gray-600 mt-4">
                 Monthly Generations: {monthlyGenerations}/20
               </p>
