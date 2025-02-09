@@ -1,6 +1,6 @@
 
 import { motion } from "framer-motion";
-import { Trophy, Award, Zap } from "lucide-react";
+import { Trophy, Award, Zap, Sparkles, Target, BarChart, DollarSign } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
@@ -46,7 +46,7 @@ const FeaturesGrid = () => (
       </h2>
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
         <FeatureCard
-          icon={<SparklesIcon className="h-8 w-8 text-lottery-powerball mx-auto" />}
+          icon={<Sparkles className="h-8 w-8 text-lottery-powerball mx-auto" />}
           title="Free Generation"
           description="Try our AI generator without an account"
         />
@@ -56,7 +56,7 @@ const FeaturesGrid = () => (
           description="Get AI-powered predictions every month"
         />
         <FeatureCard
-          icon={<ChartBarIcon className="h-8 w-8 text-purple-500 mx-auto" />}
+          icon={<BarChart className="h-8 w-8 text-purple-500 mx-auto" />}
           title="Advanced Analytics"
           description="Track numbers and view insights"
         />
