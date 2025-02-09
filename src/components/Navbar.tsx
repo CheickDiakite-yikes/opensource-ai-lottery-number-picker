@@ -4,14 +4,32 @@ import { useAuth } from "@/components/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { LogOut, User } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 export const Navbar = () => {
   const { session } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    navigate("/auth");
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      toast({
+        title: "Signed out successfully",
+        description: "You have been logged out of your account.",
+      });
+      
+      navigate("/");
+    } catch (error) {
+      console.error("Error signing out:", error);
+      toast({
+        variant: "destructive",
+        title: "Error signing out",
+        description: "There was a problem signing out. Please try again.",
+      });
+    }
   };
 
   return (
