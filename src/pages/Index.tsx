@@ -46,14 +46,14 @@ const Index = () => {
       <Navbar />
       <div className="px-4 sm:px-6 md:px-8 py-12">
         <div className="max-w-6xl mx-auto">
-          <AnimatePresence>
-            <RecentWinningNumbers recentWinningNumbers={recentWinningNumbers} />
-          </AnimatePresence>
-
           <WelcomeHeader 
             session={session} 
             monthlyGenerations={monthlyGenerations} 
           />
+
+          <AnimatePresence>
+            <RecentWinningNumbers recentWinningNumbers={recentWinningNumbers} />
+          </AnimatePresence>
 
           <LotterySection 
             session={session} 
