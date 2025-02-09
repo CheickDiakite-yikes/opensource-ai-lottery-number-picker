@@ -5,10 +5,11 @@ import { Navbar } from "@/components/Navbar";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/components/AuthProvider";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { SparklesIcon, Target, ChartBarIcon, DollarSign } from "lucide-react";
+import { SparklesIcon, Target, ChartBarIcon, DollarSign, Trophy, Award, Zap } from "lucide-react";
+import { format } from "date-fns";
 
 const Index = () => {
   const { toast } = useToast();
@@ -29,6 +30,20 @@ const Index = () => {
       return data.monthly_generations;
     },
     enabled: !!session?.user,
+  });
+
+  const { data: recentWinningNumbers } = useQuery({
+    queryKey: ["recent-winning-numbers"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("winning_numbers")
+        .select("*")
+        .order("draw_date", { ascending: false })
+        .limit(2);
+      
+      if (error) throw error;
+      return data;
+    },
   });
 
   const handleGenerate = async (type: "powerball" | "megamillions") => {
@@ -59,6 +74,11 @@ const Index = () => {
       });
 
       if (error) throw error;
+
+      toast({
+        title: "Numbers Generated!",
+        description: "Your lucky numbers have been saved.",
+      });
     } catch (error) {
       console.error("Error saving numbers:", error);
       toast({
@@ -76,6 +96,50 @@ const Index = () => {
       <Navbar />
       <div className="px-4 sm:px-6 md:px-8 py-12">
         <div className="max-w-6xl mx-auto">
+          {recentWinningNumbers && recentWinningNumbers.length > 0 && (
+            <motion.div 
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-8"
+            >
+              <h2 className="text-2xl font-semibold mb-4 text-center">Latest Winning Numbers</h2>
+              <div className="grid gap-4 md:grid-cols-2">
+                {recentWinningNumbers.map((draw) => (
+                  <motion.div
+                    key={draw.id}
+                    className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-sm border border-gray-100"
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-semibold capitalize">{draw.game_type}</h3>
+                      <span className="text-sm text-gray-500">
+                        {format(new Date(draw.draw_date), 'MMM d, yyyy')}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex gap-2">
+                        {draw.numbers.map((num, idx) => (
+                          <motion.span
+                            key={idx}
+                            className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-sm font-medium"
+                          >
+                            {num}
+                          </motion.span>
+                        ))}
+                      </div>
+                      <motion.span
+                        className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-lottery-powerball text-white text-sm font-medium ml-2"
+                      >
+                        {draw.special_number}
+                      </motion.span>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -141,9 +205,25 @@ const Index = () => {
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-gray-600 mt-4 mb-12">
-                Monthly Generations: {monthlyGenerations}/20
-              </p>
+              <div className="flex flex-col items-center gap-4 mb-12">
+                <p className="text-sm text-gray-600">
+                  Monthly Generations: {monthlyGenerations}/20
+                </p>
+                <div className="flex gap-4">
+                  <div className="flex items-center gap-2">
+                    <Trophy className="h-5 w-5 text-yellow-500" />
+                    <span className="text-sm">Streak: 3 days</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Award className="h-5 w-5 text-purple-500" />
+                    <span className="text-sm">Level: Beginner</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Zap className="h-5 w-5 text-blue-500" />
+                    <span className="text-sm">Luck Meter: 65%</span>
+                  </div>
+                </div>
+              </div>
             )}
           </motion.div>
 
