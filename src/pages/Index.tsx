@@ -22,12 +22,12 @@ const Index = () => {
       if (!session?.user) return null;
       const { data, error } = await supabase
         .from("profiles")
-        .select("monthly_generations")
+        .select("monthly_generations, streak_count, level, luck_meter")
         .eq("id", session.user.id)
         .single();
       
       if (error) throw error;
-      return data.monthly_generations;
+      return data;
     },
     enabled: !!session?.user,
   });
@@ -54,7 +54,7 @@ const Index = () => {
     }
 
     // For authenticated users, check monthly limit and save to history
-    if (monthlyGenerations >= 20) {
+    if (monthlyGenerations?.monthly_generations >= 20) {
       toast({
         title: "Monthly Limit Reached",
         description: "You've reached your limit of 20 generations this month. Please try again next month.",
@@ -96,49 +96,61 @@ const Index = () => {
       <Navbar />
       <div className="px-4 sm:px-6 md:px-8 py-12">
         <div className="max-w-6xl mx-auto">
-          {recentWinningNumbers && recentWinningNumbers.length > 0 && (
-            <motion.div 
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-8"
-            >
-              <h2 className="text-2xl font-semibold mb-4 text-center">Latest Winning Numbers</h2>
-              <div className="grid gap-4 md:grid-cols-2">
-                {recentWinningNumbers.map((draw) => (
-                  <motion.div
-                    key={draw.id}
-                    className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-sm border border-gray-100"
-                    whileHover={{ scale: 1.02 }}
-                    transition={{ type: "spring", stiffness: 300 }}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-semibold capitalize">{draw.game_type}</h3>
-                      <span className="text-sm text-gray-500">
-                        {format(new Date(draw.draw_date), 'MMM d, yyyy')}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex gap-2">
-                        {draw.numbers.map((num, idx) => (
-                          <motion.span
-                            key={idx}
-                            className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-sm font-medium"
-                          >
-                            {num}
-                          </motion.span>
-                        ))}
+          <AnimatePresence>
+            {recentWinningNumbers && recentWinningNumbers.length > 0 && (
+              <motion.div 
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="mb-8"
+              >
+                <h2 className="text-2xl font-semibold mb-4 text-center">Latest Winning Numbers</h2>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {recentWinningNumbers.map((draw) => (
+                    <motion.div
+                      key={draw.id}
+                      initial={{ scale: 0.95, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0.95, opacity: 0 }}
+                      className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-sm border border-gray-100"
+                      whileHover={{ scale: 1.02 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-semibold capitalize">{draw.game_type}</h3>
+                        <span className="text-sm text-gray-500">
+                          {format(new Date(draw.draw_date), 'MMM d, yyyy')}
+                        </span>
                       </div>
-                      <motion.span
-                        className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-lottery-powerball text-white text-sm font-medium ml-2"
-                      >
-                        {draw.special_number}
-                      </motion.span>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          )}
+                      <div className="flex items-center gap-2">
+                        <div className="flex gap-2">
+                          {draw.numbers.map((num: number, idx: number) => (
+                            <motion.span
+                              key={idx}
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              transition={{ delay: idx * 0.1 }}
+                              className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-sm font-medium"
+                            >
+                              {num}
+                            </motion.span>
+                          ))}
+                        </div>
+                        <motion.span
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ delay: 0.5 }}
+                          className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-lottery-powerball text-white text-sm font-medium ml-2"
+                        >
+                          {draw.special_number}
+                        </motion.span>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -207,21 +219,36 @@ const Index = () => {
             ) : (
               <div className="flex flex-col items-center gap-4 mb-12">
                 <p className="text-sm text-gray-600">
-                  Monthly Generations: {monthlyGenerations}/20
+                  Monthly Generations: {monthlyGenerations?.monthly_generations}/20
                 </p>
-                <div className="flex gap-4">
-                  <div className="flex items-center gap-2">
+                <div className="flex flex-wrap justify-center gap-4">
+                  <motion.div 
+                    className="flex items-center gap-2"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 }}
+                  >
                     <Trophy className="h-5 w-5 text-yellow-500" />
-                    <span className="text-sm">Streak: 3 days</span>
-                  </div>
-                  <div className="flex items-center gap-2">
+                    <span className="text-sm">Streak: {monthlyGenerations?.streak_count || 0} days</span>
+                  </motion.div>
+                  <motion.div 
+                    className="flex items-center gap-2"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 }}
+                  >
                     <Award className="h-5 w-5 text-purple-500" />
-                    <span className="text-sm">Level: Beginner</span>
-                  </div>
-                  <div className="flex items-center gap-2">
+                    <span className="text-sm">Level: {monthlyGenerations?.level || 'Beginner'}</span>
+                  </motion.div>
+                  <motion.div 
+                    className="flex items-center gap-2"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3 }}
+                  >
                     <Zap className="h-5 w-5 text-blue-500" />
-                    <span className="text-sm">Luck Meter: 65%</span>
-                  </div>
+                    <span className="text-sm">Luck Meter: {monthlyGenerations?.luck_meter || 50}%</span>
+                  </motion.div>
                 </div>
               </div>
             )}

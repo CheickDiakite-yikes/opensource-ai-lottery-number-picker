@@ -61,19 +61,34 @@ export type Database = {
           created_at: string
           id: string
           last_generation_reset: string | null
+          last_streak_date: string | null
+          level: string | null
+          luck_meter: number | null
           monthly_generations: number | null
+          streak_count: number | null
+          total_generations: number | null
         }
         Insert: {
           created_at?: string
           id: string
           last_generation_reset?: string | null
+          last_streak_date?: string | null
+          level?: string | null
+          luck_meter?: number | null
           monthly_generations?: number | null
+          streak_count?: number | null
+          total_generations?: number | null
         }
         Update: {
           created_at?: string
           id?: string
           last_generation_reset?: string | null
+          last_streak_date?: string | null
+          level?: string | null
+          luck_meter?: number | null
           monthly_generations?: number | null
+          streak_count?: number | null
+          total_generations?: number | null
         }
         Relationships: []
       }
