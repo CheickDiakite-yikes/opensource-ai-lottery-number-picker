@@ -41,7 +41,7 @@ export const Navbar = () => {
               <img 
                 src="/lovable-uploads/634f2434-e295-4a6f-8332-4f06f109f9fc.png"
                 alt="BIGLOTTO"
-                className="h-12 w-auto"
+                className="h-16 w-auto"
               />
             </Link>
             {session && (
