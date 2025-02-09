@@ -7,6 +7,7 @@ import { RecentWinningNumbers } from "@/components/home/RecentWinningNumbers";
 import { WelcomeHeader } from "@/components/home/WelcomeHeader";
 import { LotterySection } from "@/components/home/LotterySection";
 import { AnimatePresence } from "framer-motion";
+import { Helmet } from "react-helmet";
 
 const Index = () => {
   const { session } = useAuth();
@@ -41,8 +42,34 @@ const Index = () => {
     },
   });
 
+  // Structured data for search engines
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "BigLotto.ai",
+    "applicationCategory": "UtilityApplication",
+    "description": "AI-powered lottery number generator for Powerball and Mega Millions with advanced analytics and win tracking.",
+    "url": "https://biglotto.ai",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "featureList": [
+      "AI-powered number generation",
+      "Win tracking and analytics",
+      "Monthly predictions",
+      "Luck meter and streaks"
+    ]
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify(structuredData)}
+        </script>
+      </Helmet>
       <Navbar />
       <div className="px-4 sm:px-6 md:px-8 py-12">
         <div className="max-w-6xl mx-auto">
