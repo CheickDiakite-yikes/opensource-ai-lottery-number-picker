@@ -38,9 +38,11 @@ export const Navbar = () => {
         <div className="flex justify-between h-16 items-center">
           <div className="flex items-center gap-8">
             <Link to="/" className="flex-shrink-0">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-lottery-powerball to-lottery-megamillions bg-clip-text text-transparent">
-                AI Lottery
-              </h1>
+              <img 
+                src="/lovable-uploads/634f2434-e295-4a6f-8332-4f06f109f9fc.png"
+                alt="BIGLOTTO"
+                className="h-8 w-auto"
+              />
             </Link>
             {session && (
               <Link
@@ -64,7 +66,7 @@ export const Navbar = () => {
           ) : (
             <Button 
               onClick={() => navigate("/auth")}
-              className="bg-gradient-to-r from-lottery-powerball to-lottery-megamillions text-white"
+              className="bg-gradient-to-r from-[#8B4513] to-[#A0522D] text-white hover:from-[#A0522D] hover:to-[#8B4513]"
             >
               Sign Up Now
             </Button>
