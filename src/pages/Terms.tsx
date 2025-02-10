@@ -1,7 +1,32 @@
 
+import { Link } from "react-router-dom";
+
 export const Terms = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="mb-8">
+        <Link 
+          to="/" 
+          className="inline-flex items-center text-[#8B4513] hover:text-[#A0522D] transition-colors"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="mr-2 h-4 w-4"
+          >
+            <path d="m15 18-6-6 6-6"/>
+          </svg>
+          Back to Home
+        </Link>
+      </div>
+
       <h1 className="text-3xl font-bold mb-8">Terms of Service</h1>
       
       <section className="prose prose-slate max-w-none">
