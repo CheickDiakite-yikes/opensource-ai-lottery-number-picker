@@ -89,6 +89,8 @@ export type Database = {
           level: string | null
           luck_meter: number | null
           monthly_generations: number | null
+          referral_bonus_generations: number | null
+          referred_by: string | null
           streak_count: number | null
           total_generations: number | null
         }
@@ -100,6 +102,8 @@ export type Database = {
           level?: string | null
           luck_meter?: number | null
           monthly_generations?: number | null
+          referral_bonus_generations?: number | null
+          referred_by?: string | null
           streak_count?: number | null
           total_generations?: number | null
         }
@@ -111,8 +115,31 @@ export type Database = {
           level?: string | null
           luck_meter?: number | null
           monthly_generations?: number | null
+          referral_bonus_generations?: number | null
+          referred_by?: string | null
           streak_count?: number | null
           total_generations?: number | null
+        }
+        Relationships: []
+      }
+      referral_codes: {
+        Row: {
+          code: string
+          created_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          id?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -205,6 +232,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      generate_unique_referral_code: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       is_admin: {
         Args: {
           user_id: string
@@ -219,6 +250,13 @@ export type Database = {
           number: number
           frequency: number
         }[]
+      }
+      process_referral: {
+        Args: {
+          referrer_id: string
+          referred_id: string
+        }
+        Returns: undefined
       }
       reset_monthly_generations: {
         Args: Record<PropertyKey, never>
