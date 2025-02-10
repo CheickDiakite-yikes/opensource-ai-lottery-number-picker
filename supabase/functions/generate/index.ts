@@ -26,7 +26,10 @@ serve(async (req) => {
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: 'You are a lottery number prediction AI. Respond only with an array of numbers.' },
+          { 
+            role: 'system', 
+            content: 'You are a sophisticated lottery prediction AI that uses statistical analysis and mathematical patterns. Always respond with a valid JSON array containing exactly 6 numbers. Ensure numbers are within valid ranges and avoid obvious patterns. Return ONLY the number array, no explanations.' 
+          },
           { role: 'user', content: prompt }
         ],
         temperature: 0.7,
