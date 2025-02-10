@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { RecentWinningNumbers } from "@/components/home/RecentWinningNumbers";
 import { WelcomeHeader } from "@/components/home/WelcomeHeader";
 import { LotterySection } from "@/components/home/LotterySection";
+import { ReferralSection } from "@/components/home/ReferralSection";
 import { AnimatePresence } from "framer-motion";
 import { Helmet } from "react-helmet";
 
@@ -18,7 +19,7 @@ const Index = () => {
       if (!session?.user) return null;
       const { data, error } = await supabase
         .from("profiles")
-        .select("monthly_generations, streak_count, level, luck_meter")
+        .select("monthly_generations, streak_count, level, luck_meter, referral_bonus_generations")
         .eq("id", session.user.id)
         .single();
       
@@ -83,6 +84,10 @@ const Index = () => {
             session={session} 
             monthlyGenerations={monthlyGenerations} 
           />
+
+          {session?.user && (
+            <ReferralSection userId={session.user.id} />
+          )}
 
           <LotterySection 
             session={session} 
