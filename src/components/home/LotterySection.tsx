@@ -37,8 +37,17 @@ export const LotterySection = ({ session, monthlyGenerations }: LotterySectionPr
 
   const handleGenerate = async (type: "powerball" | "megamillions") => {
     try {
+      if (!session?.user) {
+        toast({
+          title: "Authentication Required",
+          description: "Please sign in to generate lottery numbers.",
+          variant: "destructive",
+        });
+        return [];
+      }
+
       // Skip limit check for admin users
-      if (session?.user && !isAdmin && monthlyGenerations) {
+      if (!isAdmin && monthlyGenerations) {
         const totalAllowedGenerations = 20 + (monthlyGenerations?.referral_bonus_generations || 0);
         if (monthlyGenerations?.monthly_generations >= totalAllowedGenerations) {
           toast({
@@ -52,33 +61,31 @@ export const LotterySection = ({ session, monthlyGenerations }: LotterySectionPr
 
       const numbers = await generateLotteryNumbers(type);
       
-      // For authenticated users, save to history
-      if (session?.user) {
-        try {
-          const { error } = await supabase.from("lottery_history").insert({
-            numbers: numbers.slice(0, -1),
-            special_number: numbers[numbers.length - 1],
-            game_type: type,
-            user_id: session.user.id
-          });
+      // Save to history
+      try {
+        const { error } = await supabase.from("lottery_history").insert({
+          numbers: numbers.slice(0, -1),
+          special_number: numbers[numbers.length - 1],
+          game_type: type,
+          user_id: session.user.id
+        });
 
-          if (error) {
-            console.error("Error saving numbers:", error);
-            throw error;
-          }
-
-          toast({
-            title: "Numbers Generated!",
-            description: "Your lucky numbers have been saved.",
-          });
-        } catch (error: any) {
+        if (error) {
           console.error("Error saving numbers:", error);
-          toast({
-            title: "Error",
-            description: "Failed to save your numbers",
-            variant: "destructive",
-          });
+          throw error;
         }
+
+        toast({
+          title: "Numbers Generated!",
+          description: "Your lucky numbers have been saved.",
+        });
+      } catch (error: any) {
+        console.error("Error saving numbers:", error);
+        toast({
+          title: "Error",
+          description: "Failed to save your numbers",
+          variant: "destructive",
+        });
       }
       
       return numbers;
