@@ -17,7 +17,7 @@ interface UseLotteryGenerationProps {
   } | null | undefined;
   isAdmin: boolean;
   anonymousGenerations: GameGenerations;
-  setAnonymousGenerations: (generations: GameGenerations) => void;
+  setAnonymousGenerations: React.Dispatch<React.SetStateAction<GameGenerations>>;
 }
 
 export const useLotteryGeneration = ({
@@ -60,7 +60,7 @@ export const useLotteryGeneration = ({
       
       // Update local state for anonymous users
       if (!session?.user) {
-        setAnonymousGenerations(prev => ({
+        setAnonymousGenerations((prev: GameGenerations) => ({
           ...prev,
           [type]: (prev[type] || 0) + 1
         }));
