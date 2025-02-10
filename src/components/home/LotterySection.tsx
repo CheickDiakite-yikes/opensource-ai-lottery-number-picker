@@ -8,6 +8,7 @@ interface LotterySectionProps {
   session: any;
   monthlyGenerations: {
     monthly_generations: number;
+    referral_bonus_generations: number | null;
   } | null | undefined;
 }
 
@@ -18,10 +19,11 @@ export const LotterySection = ({ session, monthlyGenerations }: LotterySectionPr
     try {
       // For authenticated users, check monthly limit
       if (session?.user) {
-        if (monthlyGenerations?.monthly_generations >= 20) {
+        const totalAllowedGenerations = 20 + (monthlyGenerations?.referral_bonus_generations || 0);
+        if (monthlyGenerations?.monthly_generations >= totalAllowedGenerations) {
           toast({
             title: "Monthly Limit Reached",
-            description: "You've reached your limit of 20 generations this month. Please try again next month.",
+            description: `You've reached your limit of ${totalAllowedGenerations} generations this month. Please try again next month.`,
             variant: "destructive",
           });
           return [];
