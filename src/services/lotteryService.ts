@@ -61,18 +61,22 @@ const incrementAnonymousGenerations = async (fingerprint: string) => {
 export const generateLotteryNumbers = async (
   type: "powerball" | "megamillions"
 ): Promise<number[]> => {
-  const user = await supabase.auth.getUser();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) {
+    console.error("Error getting user:", userError);
+  }
+  
   const fingerprint = await getFingerprint();
   
   try {
     // For anonymous users
-    if (!user.data.user) {
+    if (!user) {
       const { data: canGenerate, error: checkError } = await supabase
         .rpc('can_generate_anonymous', { fingerprint_param: fingerprint });
 
       if (checkError) {
         console.error("Error checking generation limit:", checkError);
-        throw checkError;
+        throw new Error("Failed to check generation limit. Please try again.");
       }
 
       if (!canGenerate) {
@@ -94,14 +98,24 @@ export const generateLotteryNumbers = async (
 
     if (error) {
       console.error("Error invoking generate function:", error);
-      throw error;
+      throw new Error("Failed to generate numbers. Please try again.");
     }
 
     if (!data || !data.generatedText) {
-      throw new Error("Failed to generate numbers");
+      throw new Error("Failed to generate numbers. Please try again.");
     }
     
-    const numbers = JSON.parse(data.generatedText);
+    let numbers;
+    try {
+      numbers = JSON.parse(data.generatedText);
+      if (!Array.isArray(numbers) || numbers.length !== 6) {
+        throw new Error("Invalid number format received");
+      }
+    } catch (parseError) {
+      console.error("Error parsing generated numbers:", parseError);
+      throw new Error("Failed to process generated numbers. Please try again.");
+    }
+    
     return numbers;
   } catch (error) {
     console.error("Error in generateLotteryNumbers:", error);

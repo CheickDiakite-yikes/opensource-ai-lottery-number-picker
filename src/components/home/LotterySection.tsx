@@ -20,17 +20,17 @@ export const LotterySection = ({ session, monthlyGenerations }: LotterySectionPr
     queryKey: ["is-admin", session?.user?.id],
     queryFn: async () => {
       if (!session?.user) return false;
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', session.user.id)
-        .eq('role', 'admin')
-        .maybeSingle();
+      
+      // Using the rpc function instead of direct table access
+      const { data, error } = await supabase.rpc('is_admin', {
+        user_id: session.user.id
+      });
       
       if (error) {
         console.error("Error checking admin status:", error);
         return false;
       }
+      
       return !!data;
     },
     enabled: !!session?.user,
@@ -63,13 +63,16 @@ export const LotterySection = ({ session, monthlyGenerations }: LotterySectionPr
             user_id: session.user.id
           });
 
-          if (error) throw error;
+          if (error) {
+            console.error("Error saving numbers:", error);
+            throw error;
+          }
 
           toast({
             title: "Numbers Generated!",
             description: "Your lucky numbers have been saved.",
           });
-        } catch (error) {
+        } catch (error: any) {
           console.error("Error saving numbers:", error);
           toast({
             title: "Error",
@@ -81,6 +84,7 @@ export const LotterySection = ({ session, monthlyGenerations }: LotterySectionPr
       
       return numbers;
     } catch (error: any) {
+      console.error("Generation error:", error);
       toast({
         title: "Error",
         description: error.message,
