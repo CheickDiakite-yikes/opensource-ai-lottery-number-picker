@@ -24,26 +24,28 @@ Return ONLY the numbers in an array format [n1,n2,n3,n4,n5,special].`;
 
 const incrementAnonymousGenerations = async (fingerprint: string) => {
   try {
-    // Update with increment or insert if not exists
-    const { error } = await supabase
+    // First try to insert a new record
+    const { error: insertError } = await supabase
       .from('anonymous_generations')
-      .upsert({
-        fingerprint,
-        monthly_generations: 1
-      }, {
-        onConflict: 'fingerprint'
-      });
+      .insert([
+        { 
+          fingerprint,
+          monthly_generations: 1
+        }
+      ])
+      .select();
 
-    if (error) throw error;
+    if (insertError && insertError.code === '23505') { // If record already exists
+      // Update existing record
+      const { error: updateError } = await supabase
+        .from('anonymous_generations')
+        .update({ monthly_generations: supabase.sql`monthly_generations + 1` })
+        .eq('fingerprint', fingerprint);
 
-    // If insert succeeded, update the count if it already existed
-    await supabase
-      .from('anonymous_generations')
-      .update({ 
-        monthly_generations: supabase.sql`monthly_generations + 1`
-      })
-      .eq('fingerprint', fingerprint);
-
+      if (updateError) throw updateError;
+    } else if (insertError) {
+      throw insertError;
+    }
   } catch (error) {
     console.error("Error incrementing anonymous generations:", error);
     throw error;
@@ -56,7 +58,7 @@ export const generateLotteryNumbers = async (
   const fingerprint = await getFingerprint();
   
   try {
-    // Check if anonymous user can generate using maybeSingle() instead of single()
+    // Check if anonymous user can generate using rpc instead of direct table access
     const { data: canGenerate, error: checkError } = await supabase
       .rpc('can_generate_anonymous', { fingerprint_param: fingerprint });
 
