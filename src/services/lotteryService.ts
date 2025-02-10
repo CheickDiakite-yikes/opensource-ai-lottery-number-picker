@@ -24,36 +24,29 @@ Return ONLY the numbers in an array format [n1,n2,n3,n4,n5,special].`;
 
 const incrementAnonymousGenerations = async (fingerprint: string) => {
   try {
-    // Get current record if exists
-    const { data: existingRecord } = await supabase
+    const { data, error } = await supabase
       .from('anonymous_generations')
-      .select()
-      .eq('fingerprint', fingerprint)
-      .maybeSingle();
-
-    if (existingRecord) {
-      // Update existing record
-      const { error } = await supabase
-        .from('anonymous_generations')
-        .update({ 
-          monthly_generations: (existingRecord.monthly_generations || 0) + 1 
-        })
-        .eq('fingerprint', fingerprint);
-
-      if (error) throw error;
-    } else {
-      // Insert new record
-      const { error } = await supabase
-        .from('anonymous_generations')
-        .insert({ 
-          fingerprint,
+      .upsert(
+        { 
+          fingerprint, 
           monthly_generations: 1 
-        });
+        },
+        { 
+          onConflict: 'fingerprint',
+          update: {
+            monthly_generations: supabase.raw('monthly_generations + 1')
+          }
+        }
+      );
 
-      if (error) throw error;
+    if (error) {
+      console.error("Error incrementing anonymous generations:", error);
+      throw error;
     }
+
+    return data;
   } catch (error) {
-    console.error("Error incrementing anonymous generations:", error);
+    console.error("Error in incrementAnonymousGenerations:", error);
     throw error;
   }
 };
@@ -61,16 +54,17 @@ const incrementAnonymousGenerations = async (fingerprint: string) => {
 export const generateLotteryNumbers = async (
   type: "powerball" | "megamillions"
 ): Promise<number[]> => {
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError) {
-    console.error("Error getting user:", userError);
-  }
-  
-  const fingerprint = await getFingerprint();
-  
   try {
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError) {
+      console.error("Error getting user:", userError);
+    }
+    
     // For anonymous users
     if (!user) {
+      const fingerprint = await getFingerprint();
+      console.log("Anonymous user with fingerprint:", fingerprint);
+      
       const { data: canGenerate, error: checkError } = await supabase
         .rpc('can_generate_anonymous', { fingerprint_param: fingerprint });
 
@@ -84,6 +78,19 @@ export const generateLotteryNumbers = async (
       }
 
       await incrementAnonymousGenerations(fingerprint);
+    } else {
+      // For authenticated users
+      const { data: canGenerate, error: checkError } = await supabase
+        .rpc('can_generate_numbers', { user_id: user.id });
+
+      if (checkError) {
+        console.error("Error checking user generation limit:", checkError);
+        throw new Error("Failed to check generation limit. Please try again.");
+      }
+
+      if (!canGenerate) {
+        throw new Error("You've reached your monthly limit of 20 generations. Try again next month!");
+      }
     }
 
     const prompt = `Generate ${
