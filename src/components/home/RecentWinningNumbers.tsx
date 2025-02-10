@@ -1,5 +1,5 @@
 
-import { format, formatDistanceToNow } from "date-fns";
+import { format, formatDistanceToNowStrict } from "date-fns";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
@@ -24,8 +24,18 @@ export const RecentWinningNumbers = ({ recentWinningNumbers, refetch }: RecentWi
       const newTimes: {[key: string]: string} = {};
       recentWinningNumbers.forEach((draw) => {
         const nextDraw = new Date(draw.next_draw);
-        if (nextDraw > new Date()) {
-          newTimes[draw.id] = formatDistanceToNow(nextDraw, { addSuffix: true });
+        const now = new Date();
+        
+        if (nextDraw > now) {
+          // Format the time difference more precisely
+          const timeLeft = formatDistanceToNowStrict(nextDraw, { 
+            addSuffix: false,
+            unit: 'second'
+          });
+          
+          newTimes[draw.id] = `Drawing in ${timeLeft}`;
+        } else {
+          newTimes[draw.id] = "Drawing now...";
         }
       });
       setTimeToNextDraw(newTimes);
@@ -34,9 +44,9 @@ export const RecentWinningNumbers = ({ recentWinningNumbers, refetch }: RecentWi
     // Initial update
     updateTimers();
 
-    // Set up intervals for updates
-    const timerInterval = setInterval(updateTimers, 1000 * 60); // Update every minute
-    const refetchInterval = setInterval(refetch, 1000 * 60 * 5); // Refetch data every 5 minutes
+    // Update more frequently (every second) for more accurate countdown
+    const timerInterval = setInterval(updateTimers, 1000);
+    const refetchInterval = setInterval(refetch, 1000 * 60 * 5); // Still refetch data every 5 minutes
 
     return () => {
       clearInterval(timerInterval);
@@ -98,7 +108,7 @@ export const RecentWinningNumbers = ({ recentWinningNumbers, refetch }: RecentWi
             </div>
             {timeToNextDraw[draw.id] && (
               <div className="text-sm text-gray-600 mt-2">
-                Next draw: {timeToNextDraw[draw.id]}
+                {timeToNextDraw[draw.id]}
               </div>
             )}
           </motion.div>
