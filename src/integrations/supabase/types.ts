@@ -239,12 +239,6 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
-      is_admin: {
-        Args: {
-          user_id: string
-        }
-        Returns: boolean
-      }
       most_common_numbers: {
         Args: {
           game_type_param: string
