@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { getFingerprint } from "./fingerprintService";
 
@@ -24,31 +23,22 @@ Return ONLY the numbers in an array format [n1,n2,n3,n4,n5,special].`;
 
 const incrementAnonymousGenerations = async (fingerprint: string) => {
   try {
-    // First try to insert a new record
-    const { error: insertError } = await supabase
+    const { error } = await supabase
       .from('anonymous_generations')
-      .insert([
+      .upsert(
         { 
           fingerprint,
-          monthly_generations: 1
+          monthly_generations: 1 
+        },
+        {
+          onConflict: 'fingerprint',
+          update: {
+            monthly_generations: supabase.raw('monthly_generations + 1')
+          }
         }
-      ])
-      .select();
+      );
 
-    if (insertError && insertError.code === '23505') { // If record already exists
-      // Update existing record using an update query
-      const { error: updateError } = await supabase
-        .from('anonymous_generations')
-        .update({ monthly_generations: 1 })
-        .eq('fingerprint', fingerprint)
-        .gte('monthly_generations', 0)
-        .select('monthly_generations')
-        .single();
-
-      if (updateError) throw updateError;
-    } else if (insertError) {
-      throw insertError;
-    }
+    if (error) throw error;
   } catch (error) {
     console.error("Error incrementing anonymous generations:", error);
     throw error;
