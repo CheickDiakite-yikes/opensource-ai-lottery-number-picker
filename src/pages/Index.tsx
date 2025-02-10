@@ -1,4 +1,3 @@
-
 import { Navbar } from "@/components/Navbar";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/AuthProvider";
@@ -38,7 +37,7 @@ const Index = () => {
     enabled: !!session?.user,
   });
 
-  const { data: recentWinningNumbers, isLoading: isLoadingWinningNumbers } = useQuery({
+  const { data: recentWinningNumbers, isLoading: isLoadingWinningNumbers, refetch } = useQuery({
     queryKey: ["recent-winning-numbers"],
     queryFn: async () => {
       console.log("Fetching winning numbers...");
@@ -61,9 +60,9 @@ const Index = () => {
       console.log("Winning numbers data:", data);
       return data;
     },
+    refetchInterval: 1000 * 60 * 5, // Refetch every 5 minutes
   });
 
-  // Structured data for search engines
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
@@ -98,7 +97,10 @@ const Index = () => {
         <div className="max-w-6xl mx-auto">
           <AnimatePresence mode="wait">
             {!isLoadingWinningNumbers && recentWinningNumbers && recentWinningNumbers.length > 0 && (
-              <RecentWinningNumbers recentWinningNumbers={recentWinningNumbers} />
+              <RecentWinningNumbers 
+                recentWinningNumbers={recentWinningNumbers} 
+                refetch={refetch}
+              />
             )}
           </AnimatePresence>
 

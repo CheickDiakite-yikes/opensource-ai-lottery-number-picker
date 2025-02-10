@@ -1,6 +1,7 @@
 
-import { format } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 interface RecentWinningNumbersProps {
   recentWinningNumbers: Array<{
@@ -9,12 +10,40 @@ interface RecentWinningNumbersProps {
     numbers: number[];
     special_number: number;
     draw_date: string;
+    next_draw: string;
   }>;
+  refetch: () => void;
 }
 
-export const RecentWinningNumbers = ({ recentWinningNumbers }: RecentWinningNumbersProps) => {
-  console.log("Rendering RecentWinningNumbers with data:", recentWinningNumbers);
+export const RecentWinningNumbers = ({ recentWinningNumbers, refetch }: RecentWinningNumbersProps) => {
+  const [timeToNextDraw, setTimeToNextDraw] = useState<{[key: string]: string}>({});
   
+  useEffect(() => {
+    // Function to update timers
+    const updateTimers = () => {
+      const newTimes: {[key: string]: string} = {};
+      recentWinningNumbers.forEach((draw) => {
+        const nextDraw = new Date(draw.next_draw);
+        if (nextDraw > new Date()) {
+          newTimes[draw.id] = formatDistanceToNow(nextDraw, { addSuffix: true });
+        }
+      });
+      setTimeToNextDraw(newTimes);
+    };
+
+    // Initial update
+    updateTimers();
+
+    // Set up intervals for updates
+    const timerInterval = setInterval(updateTimers, 1000 * 60); // Update every minute
+    const refetchInterval = setInterval(refetch, 1000 * 60 * 5); // Refetch data every 5 minutes
+
+    return () => {
+      clearInterval(timerInterval);
+      clearInterval(refetchInterval);
+    };
+  }, [recentWinningNumbers, refetch]);
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -42,7 +71,7 @@ export const RecentWinningNumbers = ({ recentWinningNumbers }: RecentWinningNumb
                 {format(new Date(draw.draw_date), 'MMM d, yyyy')}
               </span>
             </div>
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3">
               <div className="flex flex-wrap gap-1.5 sm:gap-2">
                 {draw.numbers.map((num: number, idx: number) => (
                   <motion.span
@@ -67,6 +96,11 @@ export const RecentWinningNumbers = ({ recentWinningNumbers }: RecentWinningNumb
                 {draw.special_number}
               </motion.span>
             </div>
+            {timeToNextDraw[draw.id] && (
+              <div className="text-sm text-gray-600 mt-2">
+                Next draw: {timeToNextDraw[draw.id]}
+              </div>
+            )}
           </motion.div>
         ))}
       </div>

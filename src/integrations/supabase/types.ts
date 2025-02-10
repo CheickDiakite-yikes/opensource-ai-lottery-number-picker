@@ -170,6 +170,7 @@ export type Database = {
           draw_date: string
           game_type: string
           id: string
+          next_draw: string | null
           numbers: number[]
           special_number: number
         }
@@ -178,6 +179,7 @@ export type Database = {
           draw_date: string
           game_type: string
           id?: string
+          next_draw?: string | null
           numbers: number[]
           special_number: number
         }
@@ -186,6 +188,7 @@ export type Database = {
           draw_date?: string
           game_type?: string
           id?: string
+          next_draw?: string | null
           numbers?: number[]
           special_number?: number
         }
