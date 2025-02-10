@@ -9,17 +9,14 @@ import { LotterySection } from "@/components/home/LotterySection";
 import { ReferralSection } from "@/components/home/ReferralSection";
 import { AnimatePresence } from "framer-motion";
 import { Helmet } from "react-helmet";
-import { useToast } from "@/components/ui/use-toast";
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+import { AdminWinningNumbersForm } from "@/components/home/AdminWinningNumbersForm";
+import { UnregisteredUserPrompt } from "@/components/home/UnregisteredUserPrompt";
+import { HomeContainer } from "@/components/home/HomeContainer";
 
 const Index = () => {
   const { session } = useAuth();
   const { toast } = useToast();
-  const [numbers, setNumbers] = useState<string>("");
-  const [specialNumber, setSpecialNumber] = useState<string>("");
-  const [gameType, setGameType] = useState<string>("powerball");
 
   const { data: isAdmin } = useQuery({
     queryKey: ["is-admin", session?.user?.id],
@@ -86,54 +83,6 @@ const Index = () => {
     refetchInterval: 1000 * 60 * 5, // Refetch every 5 minutes
   });
 
-  const handleAddWinningNumbers = async () => {
-    try {
-      const numbersArray = numbers.split(',').map(n => parseInt(n.trim()));
-      const specialNumberInt = parseInt(specialNumber);
-
-      if (numbersArray.length !== 5 || isNaN(specialNumberInt)) {
-        toast({
-          variant: "destructive",
-          title: "Invalid Input",
-          description: "Please enter 5 comma-separated numbers and a special number",
-        });
-        return;
-      }
-
-      const { error } = await supabase
-        .from('winning_numbers')
-        .insert({
-          numbers: numbersArray,
-          special_number: specialNumberInt,
-          game_type: gameType,
-          draw_date: new Date().toISOString(),
-        });
-
-      if (error) {
-        throw error;
-      }
-
-      toast({
-        title: "Success",
-        description: "Winning numbers added successfully",
-      });
-
-      // Clear inputs
-      setNumbers("");
-      setSpecialNumber("");
-      
-      // Refetch the winning numbers
-      refetch();
-    } catch (error) {
-      console.error("Error adding winning numbers:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to add winning numbers",
-      });
-    }
-  };
-
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
@@ -162,7 +111,7 @@ const Index = () => {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+    <HomeContainer>
       <Helmet>
         <title>BigLotto.ai - #1 AI-Powered Lottery Number Generator | Smart Lottery Predictions</title>
         <meta name="description" content="Generate winning lottery numbers using advanced AI technology. Get smart predictions for Powerball and Mega Millions with 20 free generations monthly. Join thousands of users leveraging artificial intelligence for lottery picks." />
@@ -172,82 +121,36 @@ const Index = () => {
         <link rel="canonical" href="https://biglotto.ai" />
       </Helmet>
       <Navbar />
-      <article className="px-4 sm:px-6 md:px-8 py-8 sm:py-12">
-        <div className="max-w-6xl mx-auto">
-          <AnimatePresence mode="wait">
-            {!isLoadingWinningNumbers && recentWinningNumbers && recentWinningNumbers.length > 0 && (
-              <RecentWinningNumbers 
-                recentWinningNumbers={recentWinningNumbers} 
-                refetch={refetch}
-              />
-            )}
-          </AnimatePresence>
-
-          {isAdmin && (
-            <section className="mt-8 p-6 bg-white rounded-xl shadow-sm border border-gray-200">
-              <h2 className="text-xl font-semibold mb-4">Admin: Add Winning Numbers</h2>
-              <div className="space-y-4">
-                <div className="flex gap-4">
-                  <div className="flex-1">
-                    <label className="block text-sm font-medium mb-1">Numbers (comma-separated)</label>
-                    <Input
-                      placeholder="e.g. 1,2,3,4,5"
-                      value={numbers}
-                      onChange={(e) => setNumbers(e.target.value)}
-                    />
-                  </div>
-                  <div className="w-32">
-                    <label className="block text-sm font-medium mb-1">Special Number</label>
-                    <Input
-                      placeholder="e.g. 6"
-                      value={specialNumber}
-                      onChange={(e) => setSpecialNumber(e.target.value)}
-                    />
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <select
-                    className="p-2 border rounded"
-                    value={gameType}
-                    onChange={(e) => setGameType(e.target.value)}
-                  >
-                    <option value="powerball">Powerball</option>
-                    <option value="mega_millions">Mega Millions</option>
-                  </select>
-                  <Button onClick={handleAddWinningNumbers}>Add Winning Numbers</Button>
-                </div>
-              </div>
-            </section>
-          )}
-
-          <WelcomeHeader 
-            session={session} 
-            monthlyGenerations={monthlyGenerations} 
+      
+      <AnimatePresence mode="wait">
+        {!isLoadingWinningNumbers && recentWinningNumbers && recentWinningNumbers.length > 0 && (
+          <RecentWinningNumbers 
+            recentWinningNumbers={recentWinningNumbers} 
+            refetch={refetch}
           />
+        )}
+      </AnimatePresence>
 
-          <LotterySection 
-            session={session} 
-            monthlyGenerations={monthlyGenerations} 
-          />
+      {isAdmin && (
+        <AdminWinningNumbersForm refetch={refetch} />
+      )}
 
-          {!session?.user && (
-            <section className="mt-8 sm:mt-12 bg-white/80 backdrop-blur-sm p-4 sm:p-6 rounded-2xl shadow-lg border border-gray-100">
-              <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-3 sm:mb-4">
-                Join Our Community & Get More Free Generations!
-              </h2>
-              <p className="text-sm sm:text-base text-gray-600">
-                Sign up now and use referral codes to get <strong className="font-semibold text-purple-600">10 extra free generations</strong>. 
-                Invite your friends and both of you will receive bonus predictions!
-              </p>
-            </section>
-          )}
+      <WelcomeHeader 
+        session={session} 
+        monthlyGenerations={monthlyGenerations} 
+      />
 
-          {session?.user && (
-            <ReferralSection userId={session.user.id} />
-          )}
-        </div>
-      </article>
-    </main>
+      <LotterySection 
+        session={session} 
+        monthlyGenerations={monthlyGenerations} 
+      />
+
+      {!session?.user && <UnregisteredUserPrompt />}
+
+      {session?.user && (
+        <ReferralSection userId={session.user.id} />
+      )}
+    </HomeContainer>
   );
 };
 
