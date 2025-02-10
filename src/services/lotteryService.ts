@@ -61,11 +61,12 @@ const incrementAnonymousGenerations = async (fingerprint: string) => {
 export const generateLotteryNumbers = async (
   type: "powerball" | "megamillions"
 ): Promise<number[]> => {
+  const user = await supabase.auth.getUser();
   const fingerprint = await getFingerprint();
   
   try {
-    // For anonymous users only
-    if (!supabase.auth.getUser()) {
+    // For anonymous users
+    if (!user.data.user) {
       const { data: canGenerate, error: checkError } = await supabase
         .rpc('can_generate_anonymous', { fingerprint_param: fingerprint });
 

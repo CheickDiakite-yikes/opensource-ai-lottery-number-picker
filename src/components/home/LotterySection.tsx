@@ -20,25 +20,26 @@ export const LotterySection = ({ session, monthlyGenerations }: LotterySectionPr
     queryKey: ["is-admin", session?.user?.id],
     queryFn: async () => {
       if (!session?.user) return false;
-      const { data, error } = await supabase.rpc('is_admin', {
-        user_id: session.user.id
-      });
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', session.user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+      
       if (error) {
         console.error("Error checking admin status:", error);
         return false;
       }
-      console.log("Is admin check result:", data); // Debug log
-      return data;
+      return !!data;
     },
     enabled: !!session?.user,
   });
 
   const handleGenerate = async (type: "powerball" | "megamillions") => {
     try {
-      console.log("Is admin status:", isAdmin); // Debug log
-      
       // Skip limit check for admin users
-      if (!session?.user || (!isAdmin && monthlyGenerations)) {
+      if (session?.user && !isAdmin && monthlyGenerations) {
         const totalAllowedGenerations = 20 + (monthlyGenerations?.referral_bonus_generations || 0);
         if (monthlyGenerations?.monthly_generations >= totalAllowedGenerations) {
           toast({
