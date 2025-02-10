@@ -27,6 +27,7 @@ export const LotterySection = ({ session, monthlyGenerations }: LotterySectionPr
         console.error("Error checking admin status:", error);
         return false;
       }
+      console.log("Is admin check result:", data); // Debug log
       return data;
     },
     enabled: !!session?.user,
@@ -34,6 +35,7 @@ export const LotterySection = ({ session, monthlyGenerations }: LotterySectionPr
 
   const handleGenerate = async (type: "powerball" | "megamillions") => {
     try {
+      console.log("Is admin status:", isAdmin); // Debug log
       // For authenticated users, check monthly limit (skip for admins)
       if (session?.user && !isAdmin) {
         const totalAllowedGenerations = 20 + (monthlyGenerations?.referral_bonus_generations || 0);
