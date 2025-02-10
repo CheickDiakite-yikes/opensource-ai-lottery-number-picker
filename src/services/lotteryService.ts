@@ -23,9 +23,17 @@ For Mega Millions:
 Return ONLY the numbers in an array format [n1,n2,n3,n4,n5,special].`;
 
 const incrementAnonymousGenerations = async (fingerprint: string) => {
+  // First get current value
+  const { data: current } = await supabase
+    .from('anonymous_generations')
+    .select('monthly_generations')
+    .eq('fingerprint', fingerprint)
+    .single();
+
+  // Then update with incremented value
   const { error } = await supabase
     .from('anonymous_generations')
-    .update({ monthly_generations: supabase.sql`monthly_generations + 1` })
+    .update({ monthly_generations: (current?.monthly_generations || 0) + 1 })
     .eq('fingerprint', fingerprint);
 
   if (error) throw error;
