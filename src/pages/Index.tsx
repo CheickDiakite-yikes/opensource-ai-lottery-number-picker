@@ -22,14 +22,17 @@ const Index = () => {
     queryKey: ["is-admin", session?.user?.id],
     queryFn: async () => {
       if (!session?.user) return false;
-      const { data, error } = await supabase.rpc('is_admin', {
-        user_id: session.user.id
+      
+      const { data, error } = await supabase.rpc('check_is_admin', {
+        user_id_param: session.user.id
       });
+      
       if (error) {
         console.error("Error checking admin status:", error);
         return false;
       }
-      return data;
+      
+      return !!data;
     },
     enabled: !!session?.user,
   });

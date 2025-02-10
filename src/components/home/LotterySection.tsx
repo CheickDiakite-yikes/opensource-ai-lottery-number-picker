@@ -21,9 +21,8 @@ export const LotterySection = ({ session, monthlyGenerations }: LotterySectionPr
     queryFn: async () => {
       if (!session?.user) return false;
       
-      // Using the rpc function instead of direct table access
-      const { data, error } = await supabase.rpc('is_admin', {
-        user_id: session.user.id
+      const { data, error } = await supabase.rpc('check_is_admin', {
+        user_id_param: session.user.id
       });
       
       if (error) {
