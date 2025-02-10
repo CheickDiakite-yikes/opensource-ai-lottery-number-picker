@@ -1,5 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { getFingerprint } from "./fingerprintService";
 
 const systemPrompt = `You are an advanced AI lottery number predictor specializing in strategic number generation. Analyze the following factors:
 
@@ -21,9 +22,30 @@ For Mega Millions:
 
 Return ONLY the numbers in an array format [n1,n2,n3,n4,n5,special].`;
 
+const incrementAnonymousGenerations = async (fingerprint: string) => {
+  const { error } = await supabase
+    .from('anonymous_generations')
+    .update({ monthly_generations: supabase.sql`monthly_generations + 1` })
+    .eq('fingerprint', fingerprint);
+
+  if (error) throw error;
+};
+
 export const generateLotteryNumbers = async (
   type: "powerball" | "megamillions"
 ): Promise<number[]> => {
+  const fingerprint = await getFingerprint();
+  
+  // Check if anonymous user can generate
+  const { data: canGenerate, error: checkError } = await supabase
+    .rpc('can_generate_anonymous', { fingerprint_param: fingerprint });
+
+  if (checkError) throw checkError;
+
+  if (!canGenerate) {
+    throw new Error("You've reached your monthly limit of 5 generations. Sign up for 20 generations per month!");
+  }
+
   const prompt = `Generate ${
     type === "powerball" ? "Powerball" : "Mega Millions"
   } numbers. Format: [n1,n2,n3,n4,n5,special]`;
@@ -43,6 +65,8 @@ export const generateLotteryNumbers = async (
       throw new Error("Failed to generate numbers");
     }
 
+    await incrementAnonymousGenerations(fingerprint);
+    
     const numbers = JSON.parse(data.generatedText);
     return numbers;
   } catch (error) {

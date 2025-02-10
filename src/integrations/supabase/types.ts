@@ -9,6 +9,30 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      anonymous_generations: {
+        Row: {
+          created_at: string | null
+          fingerprint: string
+          id: string
+          last_generation_reset: string | null
+          monthly_generations: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          fingerprint: string
+          id?: string
+          last_generation_reset?: string | null
+          monthly_generations?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          fingerprint?: string
+          id?: string
+          last_generation_reset?: string | null
+          monthly_generations?: number | null
+        }
+        Relationships: []
+      }
       lottery_history: {
         Row: {
           checked_at: string | null
@@ -155,6 +179,12 @@ export type Database = {
           win_rate: number
           total_earnings: number
         }[]
+      }
+      can_generate_anonymous: {
+        Args: {
+          fingerprint_param: string
+        }
+        Returns: boolean
       }
       can_generate_numbers: {
         Args: {

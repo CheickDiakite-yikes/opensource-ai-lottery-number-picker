@@ -15,48 +15,56 @@ export const LotterySection = ({ session, monthlyGenerations }: LotterySectionPr
   const { toast } = useToast();
 
   const handleGenerate = async (type: "powerball" | "megamillions") => {
-    // For unauthenticated users, just generate numbers without saving
-    if (!session?.user) {
-      const numbers = await generateLotteryNumbers(type);
-      return numbers;
-    }
+    try {
+      // For authenticated users, check monthly limit
+      if (session?.user) {
+        if (monthlyGenerations?.monthly_generations >= 20) {
+          toast({
+            title: "Monthly Limit Reached",
+            description: "You've reached your limit of 20 generations this month. Please try again next month.",
+            variant: "destructive",
+          });
+          return [];
+        }
+      }
 
-    // For authenticated users, check monthly limit and save to history
-    if (monthlyGenerations?.monthly_generations >= 20) {
+      const numbers = await generateLotteryNumbers(type);
+      
+      // For authenticated users, save to history
+      if (session?.user) {
+        try {
+          const { error } = await supabase.from("lottery_history").insert({
+            numbers: numbers.slice(0, -1),
+            special_number: numbers[numbers.length - 1],
+            game_type: type,
+            user_id: session.user.id
+          });
+
+          if (error) throw error;
+
+          toast({
+            title: "Numbers Generated!",
+            description: "Your lucky numbers have been saved.",
+          });
+        } catch (error) {
+          console.error("Error saving numbers:", error);
+          toast({
+            title: "Error",
+            description: "Failed to save your numbers",
+            variant: "destructive",
+          });
+        }
+      }
+      
+      return numbers;
+    } catch (error: any) {
       toast({
-        title: "Monthly Limit Reached",
-        description: "You've reached your limit of 20 generations this month. Please try again next month.",
+        title: "Generation Limit Reached",
+        description: error.message,
         variant: "destructive",
       });
       return [];
     }
-
-    const numbers = await generateLotteryNumbers(type);
-    
-    try {
-      const { error } = await supabase.from("lottery_history").insert({
-        numbers: numbers.slice(0, -1),
-        special_number: numbers[numbers.length - 1],
-        game_type: type,
-        user_id: session.user.id
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Numbers Generated!",
-        description: "Your lucky numbers have been saved.",
-      });
-    } catch (error) {
-      console.error("Error saving numbers:", error);
-      toast({
-        title: "Error",
-        description: "Failed to save your numbers",
-        variant: "destructive",
-      });
-    }
-    
-    return numbers;
   };
 
   return (
