@@ -17,18 +17,18 @@ export const LotteryNumbers = ({ numbers, isGenerating, isPowerball }: LotteryNu
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="flex flex-wrap gap-2 sm:gap-4 mb-6 sm:mb-8 justify-center"
+          className="flex flex-wrap gap-4 mb-8 justify-center"
         >
           {Array(6).fill(0).map((_, index) => (
-            <Skeleton key={index} className="w-12 h-12 sm:w-16 sm:h-16 rounded-full" />
+            <Skeleton key={index} className="w-[72px] h-[72px] rounded-full" />
           ))}
         </motion.div>
       ) : numbers.length > 0 ? (
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.8 }}
-          className="flex flex-wrap gap-2 sm:gap-4 mb-6 sm:mb-8 justify-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="flex flex-wrap gap-4 mb-8 justify-center"
         >
           {numbers.map((number, index) => (
             <LotteryNumber
@@ -43,4 +43,3 @@ export const LotteryNumbers = ({ numbers, isGenerating, isPowerball }: LotteryNu
     </AnimatePresence>
   );
 };
-

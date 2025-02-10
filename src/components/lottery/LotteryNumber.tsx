@@ -19,14 +19,14 @@ export const LotteryNumber = ({ number, isPowerball, index }: LotteryNumberProps
   
   const content = (
     <motion.div
-      initial={{ scale: 0, opacity: 0 }}
+      initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ delay: index * 0.1, duration: 0.3 }}
-      className={`relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 rounded-full 
+      className={`relative flex items-center justify-center w-[72px] h-[72px] rounded-full 
         ${isPowerball 
-          ? "bg-lottery-powerball text-white shadow-lg shadow-lottery-powerball/30" 
+          ? "bg-lottery-powerball/90 text-white shadow-lg shadow-lottery-powerball/30" 
           : "bg-white shadow-lg"
-        } font-bold text-lg sm:text-xl md:text-2xl cursor-help active:scale-95 touch-manipulation`}
+        } font-bold text-2xl cursor-help hover:scale-105 transition-transform duration-200`}
     >
       <motion.span
         initial={{ opacity: 0, y: 20 }}
