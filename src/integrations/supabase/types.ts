@@ -222,6 +222,12 @@ export type Database = {
         }
         Returns: boolean
       }
+      check_is_admin: {
+        Args: {
+          user_id_param: string
+        }
+        Returns: boolean
+      }
       check_lottery_match: {
         Args: {
           lottery_numbers: number[]
