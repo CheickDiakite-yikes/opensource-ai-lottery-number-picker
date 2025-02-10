@@ -1,14 +1,11 @@
-
 import { LotteryCard } from "@/components/LotteryCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { generateLotteryNumbers } from "@/services/lotteryService";
 import { useQuery } from "@tanstack/react-query";
 import { getFingerprint } from "@/services/fingerprintService";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
-import { Sparkles, Lock } from "lucide-react";
+import { AnonymousUserAlert } from "./AnonymousUserAlert";
 
 interface GameGenerations {
   powerball: number;
@@ -49,7 +46,6 @@ export const LotterySection = ({ session, monthlyGenerations }: LotterySectionPr
     enabled: !!session?.user,
   });
 
-  // Fetch anonymous generations count
   useEffect(() => {
     const fetchAnonymousGenerations = async () => {
       if (session?.user) return; // Don't fetch for logged-in users
@@ -178,43 +174,7 @@ export const LotterySection = ({ session, monthlyGenerations }: LotterySectionPr
   return (
     <div className="space-y-6">
       {!session?.user && (
-        <Alert className="bg-white/50 backdrop-blur-lg border-none shadow-lg">
-          <AlertDescription className="p-4">
-            <div className="flex flex-col space-y-6">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-yellow-500" />
-                  <span className="text-lg font-medium">Get</span>
-                  <Badge variant="secondary" className="text-base px-3 py-1">
-                    5 free generations
-                  </Badge>
-                  <span className="text-lg font-medium">per game</span>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-3 text-sm">
-                  <div className="flex items-center gap-2 bg-white/80 rounded-full px-4 py-2">
-                    <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                    <span>Powerball: {5 - anonymousGenerations.powerball} left</span>
-                  </div>
-                  <div className="flex items-center gap-2 bg-white/80 rounded-full px-4 py-2">
-                    <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                    <span>Mega Millions: {5 - anonymousGenerations.megamillions} left</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2">
-                <div className="flex items-center gap-2">
-                  <Lock className="h-5 w-5 text-primary" />
-                  <span className="text-lg font-medium">Sign up for</span>
-                  <Badge variant="secondary" className="text-base px-3 py-1">
-                    20 monthly generations
-                  </Badge>
-                  <span className="text-lg font-medium">+ referral bonuses!</span>
-                </div>
-              </div>
-            </div>
-          </AlertDescription>
-        </Alert>
+        <AnonymousUserAlert anonymousGenerations={anonymousGenerations} />
       )}
       
       <div className="grid gap-8 md:grid-cols-2">
