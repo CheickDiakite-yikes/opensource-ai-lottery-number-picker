@@ -3,6 +3,7 @@ import { LotteryCard } from "@/components/LotteryCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { generateLotteryNumbers } from "@/services/lotteryService";
+import { useQuery } from "@tanstack/react-query";
 
 interface LotterySectionProps {
   session: any;
@@ -15,10 +16,26 @@ interface LotterySectionProps {
 export const LotterySection = ({ session, monthlyGenerations }: LotterySectionProps) => {
   const { toast } = useToast();
 
+  const { data: isAdmin } = useQuery({
+    queryKey: ["is-admin", session?.user?.id],
+    queryFn: async () => {
+      if (!session?.user) return false;
+      const { data, error } = await supabase.rpc('is_admin', {
+        user_id: session.user.id
+      });
+      if (error) {
+        console.error("Error checking admin status:", error);
+        return false;
+      }
+      return data;
+    },
+    enabled: !!session?.user,
+  });
+
   const handleGenerate = async (type: "powerball" | "megamillions") => {
     try {
-      // For authenticated users, check monthly limit
-      if (session?.user) {
+      // For authenticated users, check monthly limit (skip for admins)
+      if (session?.user && !isAdmin) {
         const totalAllowedGenerations = 20 + (monthlyGenerations?.referral_bonus_generations || 0);
         if (monthlyGenerations?.monthly_generations >= totalAllowedGenerations) {
           toast({
