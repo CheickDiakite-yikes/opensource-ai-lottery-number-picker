@@ -27,10 +27,10 @@ export const RecentWinningNumbers = ({ recentWinningNumbers, refetch }: RecentWi
         const now = new Date();
         
         if (nextDraw > now) {
-          // Format the time difference more precisely
+          // Format the time difference starting with days
           const timeLeft = formatDistanceToNowStrict(nextDraw, { 
             addSuffix: false,
-            unit: 'second'
+            unit: 'day'
           });
           
           newTimes[draw.id] = `Drawing in ${timeLeft}`;
@@ -117,3 +117,4 @@ export const RecentWinningNumbers = ({ recentWinningNumbers, refetch }: RecentWi
     </motion.div>
   );
 };
+
