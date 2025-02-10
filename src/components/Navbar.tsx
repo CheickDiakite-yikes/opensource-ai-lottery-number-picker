@@ -39,9 +39,9 @@ export const Navbar = () => {
           <div className="flex items-center gap-8">
             <Link to="/" className="flex-shrink-0">
               <img 
-                src="/assets/logo.png"
+                src="/lovable-uploads/546d4159-8b21-4aac-ba4f-9aa483d514f8.png"
                 alt="BIGLOTTO"
-                className="h-16 w-auto"
+                className="h-12 w-auto"
               />
             </Link>
             {session && (
