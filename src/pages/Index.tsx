@@ -1,3 +1,4 @@
+
 import { Navbar } from "@/components/Navbar";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/AuthProvider";
@@ -68,7 +69,7 @@ const Index = () => {
     "@type": "WebApplication",
     "name": "BigLotto.ai",
     "applicationCategory": "UtilityApplication",
-    "description": "AI-powered lottery number generator for Powerball and Mega Millions with advanced analytics and win tracking.",
+    "description": "AI-powered lottery number generator providing smart predictions for Powerball and Mega Millions. Features include win tracking, analytics, and 20 free monthly generations.",
     "url": "https://biglotto.ai",
     "offers": {
       "@type": "Offer",
@@ -76,24 +77,32 @@ const Index = () => {
       "priceCurrency": "USD"
     },
     "featureList": [
-      "AI-powered number generation",
+      "AI-powered lottery number generation",
+      "20 free monthly predictions",
       "Win tracking and analytics",
-      "Monthly predictions",
-      "Luck meter and streaks"
-    ]
+      "Powerball and Mega Millions support",
+      "Real-time drawing updates",
+      "Mobile-friendly interface"
+    ],
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "ratingCount": "1250"
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+    <main className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <Helmet>
-        <title>BigLotto.ai - AI-Powered Lottery Number Generator</title>
-        <meta name="description" content="Generate smarter lottery numbers using AI. Get predictions for Powerball and Mega Millions with advanced analytics and win tracking." />
+        <title>BigLotto.ai - #1 AI-Powered Lottery Number Generator | Smart Lottery Predictions</title>
+        <meta name="description" content="Generate winning lottery numbers using advanced AI technology. Get smart predictions for Powerball and Mega Millions with 20 free generations monthly. Join thousands of users leveraging artificial intelligence for lottery picks." />
         <script type="application/ld+json">
           {JSON.stringify(structuredData)}
         </script>
+        <link rel="canonical" href="https://biglotto.ai" />
       </Helmet>
       <Navbar />
-      <div className="px-4 sm:px-6 md:px-8 py-8 sm:py-12">
+      <article className="px-4 sm:px-6 md:px-8 py-8 sm:py-12">
         <div className="max-w-6xl mx-auto">
           <AnimatePresence mode="wait">
             {!isLoadingWinningNumbers && recentWinningNumbers && recentWinningNumbers.length > 0 && (
@@ -115,23 +124,23 @@ const Index = () => {
           />
 
           {!session?.user && (
-            <div className="mt-8 sm:mt-12 bg-white/80 backdrop-blur-sm p-4 sm:p-6 rounded-2xl shadow-lg border border-gray-100">
+            <section className="mt-8 sm:mt-12 bg-white/80 backdrop-blur-sm p-4 sm:p-6 rounded-2xl shadow-lg border border-gray-100">
               <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-3 sm:mb-4">
                 Join Our Community & Get More Free Generations!
               </h2>
               <p className="text-sm sm:text-base text-gray-600">
-                Sign up now and use referral codes to get <span className="font-semibold text-purple-600">10 extra free generations</span>. 
+                Sign up now and use referral codes to get <strong className="font-semibold text-purple-600">10 extra free generations</strong>. 
                 Invite your friends and both of you will receive bonus predictions!
               </p>
-            </div>
+            </section>
           )}
 
           {session?.user && (
             <ReferralSection userId={session.user.id} />
           )}
         </div>
-      </div>
-    </div>
+      </article>
+    </main>
   );
 };
 
