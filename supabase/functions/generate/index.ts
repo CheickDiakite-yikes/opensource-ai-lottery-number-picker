@@ -25,7 +25,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4',
+        model: 'o3-mini',
         messages: [
           { 
             role: 'system', 
@@ -66,7 +66,7 @@ Ensure all numbers are within valid ranges and properly ordered.`
           },
           { role: 'user', content: prompt }
         ],
-        temperature: 0.6,
+        reasoning_effort: "high"
       }),
     });
 
