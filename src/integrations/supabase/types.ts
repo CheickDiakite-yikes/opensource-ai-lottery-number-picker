@@ -13,6 +13,7 @@ export type Database = {
         Row: {
           created_at: string | null
           fingerprint: string
+          game_type: string
           id: string
           last_generation_reset: string | null
           monthly_generations: number | null
@@ -20,6 +21,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           fingerprint: string
+          game_type: string
           id?: string
           last_generation_reset?: string | null
           monthly_generations?: number | null
@@ -27,6 +29,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           fingerprint?: string
+          game_type?: string
           id?: string
           last_generation_reset?: string | null
           monthly_generations?: number | null
@@ -210,12 +213,20 @@ export type Database = {
           total_earnings: number
         }[]
       }
-      can_generate_anonymous: {
-        Args: {
-          fingerprint_param: string
-        }
-        Returns: boolean
-      }
+      can_generate_anonymous:
+        | {
+            Args: {
+              fingerprint_param: string
+            }
+            Returns: boolean
+          }
+        | {
+            Args: {
+              fingerprint_param: string
+              game_type_param: string
+            }
+            Returns: boolean
+          }
       can_generate_numbers: {
         Args: {
           user_id: string

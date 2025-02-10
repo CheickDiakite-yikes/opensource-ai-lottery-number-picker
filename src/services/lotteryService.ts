@@ -2,33 +2,16 @@
 import { supabase } from "@/integrations/supabase/client";
 import { getFingerprint } from "./fingerprintService";
 
-const systemPrompt = `You are an advanced AI lottery number predictor specializing in strategic number generation. Analyze the following factors:
+const systemPrompt = `// ... keep existing code`;
 
-1. Statistical Distribution: Ensure numbers are well-distributed across the possible range
-2. Pattern Analysis: Avoid obvious patterns like all consecutive numbers
-3. Hot/Cold Analysis: Consider both frequently drawn numbers and overdue numbers
-4. Number Grouping: Balance between low and high numbers
-5. Sum Analysis: Keep the total sum within historically successful ranges
-
-For Powerball:
-- Generate 5 main numbers (1-69)
-- 1 Powerball number (1-26)
-- Consider statistical weight of even/odd ratios
-
-For Mega Millions:
-- Generate 5 main numbers (1-70)
-- 1 Mega Ball number (1-25)
-- Maintain historical distribution patterns
-
-Return ONLY the numbers in an array format [n1,n2,n3,n4,n5,special].`;
-
-const incrementAnonymousGenerations = async (fingerprint: string) => {
+const incrementAnonymousGenerations = async (fingerprint: string, gameType: string) => {
   try {
     // First select the current record to get the current monthly_generations value
     const { data: currentRecord } = await supabase
       .from('anonymous_generations')
       .select('monthly_generations')
       .eq('fingerprint', fingerprint)
+      .eq('game_type', gameType)
       .single();
 
     const newMonthlyGenerations = (currentRecord?.monthly_generations || 0) + 1;
@@ -38,9 +21,10 @@ const incrementAnonymousGenerations = async (fingerprint: string) => {
       .from('anonymous_generations')
       .upsert({
         fingerprint,
+        game_type: gameType,
         monthly_generations: newMonthlyGenerations,
       }, {
-        onConflict: 'fingerprint'
+        onConflict: 'fingerprint,game_type'
       });
 
     if (error) {
@@ -70,7 +54,10 @@ export const generateLotteryNumbers = async (
       console.log("Anonymous user with fingerprint:", fingerprint);
       
       const { data: canGenerate, error: checkError } = await supabase
-        .rpc('can_generate_anonymous', { fingerprint_param: fingerprint });
+        .rpc('can_generate_anonymous', { 
+          fingerprint_param: fingerprint,
+          game_type_param: type
+        });
 
       if (checkError) {
         console.error("Error checking generation limit:", checkError);
@@ -78,10 +65,10 @@ export const generateLotteryNumbers = async (
       }
 
       if (!canGenerate) {
-        throw new Error("You've reached your monthly limit of 5 generations. Sign up for 20 generations per month!");
+        throw new Error(`You've reached your limit of 5 free ${type} generations. Sign up for more!`);
       }
 
-      await incrementAnonymousGenerations(fingerprint);
+      await incrementAnonymousGenerations(fingerprint, type);
     } else {
       // For authenticated users
       const { data: canGenerate, error: checkError } = await supabase
@@ -93,7 +80,7 @@ export const generateLotteryNumbers = async (
       }
 
       if (!canGenerate) {
-        throw new Error("You've reached your monthly limit of 20 generations. Try again next month!");
+        throw new Error("You've reached your monthly limit. Try again next month!");
       }
     }
 

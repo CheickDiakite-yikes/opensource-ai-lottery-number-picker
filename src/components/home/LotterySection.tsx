@@ -9,6 +9,11 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
 
+interface GameGenerations {
+  powerball: number;
+  megamillions: number;
+}
+
 interface LotterySectionProps {
   session: any;
   monthlyGenerations: {
@@ -19,7 +24,10 @@ interface LotterySectionProps {
 
 export const LotterySection = ({ session, monthlyGenerations }: LotterySectionProps) => {
   const { toast } = useToast();
-  const [anonymousGenerations, setAnonymousGenerations] = useState<number>(0);
+  const [anonymousGenerations, setAnonymousGenerations] = useState<GameGenerations>({
+    powerball: 0,
+    megamillions: 0
+  });
 
   const { data: isAdmin } = useQuery({
     queryKey: ["is-admin", session?.user?.id],
@@ -49,16 +57,28 @@ export const LotterySection = ({ session, monthlyGenerations }: LotterySectionPr
         const fingerprint = await getFingerprint();
         const { data, error } = await supabase
           .from('anonymous_generations')
-          .select('monthly_generations')
-          .eq('fingerprint', fingerprint)
-          .single();
+          .select('monthly_generations, game_type')
+          .eq('fingerprint', fingerprint);
 
-        if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+        if (error) {
           console.error("Error fetching anonymous generations:", error);
           return;
         }
 
-        setAnonymousGenerations(data?.monthly_generations || 0);
+        const generations: GameGenerations = {
+          powerball: 0,
+          megamillions: 0
+        };
+
+        data?.forEach(record => {
+          if (record.game_type === 'powerball') {
+            generations.powerball = record.monthly_generations || 0;
+          } else if (record.game_type === 'megamillions') {
+            generations.megamillions = record.monthly_generations || 0;
+          }
+        });
+
+        setAnonymousGenerations(generations);
       } catch (error) {
         console.error("Error in fetchAnonymousGenerations:", error);
       }
@@ -70,10 +90,14 @@ export const LotterySection = ({ session, monthlyGenerations }: LotterySectionPr
   const handleGenerate = async (type: "powerball" | "megamillions") => {
     try {
       if (!session?.user) {
-        if (anonymousGenerations >= 5) {
+        const currentGenerations = type === 'powerball' 
+          ? anonymousGenerations.powerball 
+          : anonymousGenerations.megamillions;
+          
+        if (currentGenerations >= 5) {
           toast({
             title: "Free Generations Limit Reached",
-            description: "Sign up to get 20 free generations per month!",
+            description: `You've used all 5 free ${type} generations. Sign up to get 20 monthly generations plus referral bonuses!`,
             variant: "destructive",
           });
           return [];
@@ -94,7 +118,10 @@ export const LotterySection = ({ session, monthlyGenerations }: LotterySectionPr
       
       // Update local state for anonymous users
       if (!session?.user) {
-        setAnonymousGenerations(prev => prev + 1);
+        setAnonymousGenerations(prev => ({
+          ...prev,
+          [type]: (prev[type] || 0) + 1
+        }));
       }
       
       // Save to history if user is logged in
@@ -125,9 +152,13 @@ export const LotterySection = ({ session, monthlyGenerations }: LotterySectionPr
           });
         }
       } else {
+        const remainingGenerations = 5 - (type === 'powerball' ? 
+          anonymousGenerations.powerball + 1 : 
+          anonymousGenerations.megamillions + 1);
+          
         toast({
           title: "Numbers Generated!",
-          description: `${5 - anonymousGenerations - 1} free generations remaining.`,
+          description: `${remainingGenerations} free ${type} generations remaining.`,
         });
       }
       
@@ -147,14 +178,23 @@ export const LotterySection = ({ session, monthlyGenerations }: LotterySectionPr
     <div className="space-y-6">
       {!session?.user && (
         <Alert>
-          <AlertDescription className="flex items-center justify-between">
-            <span>
-              Get <Badge variant="outline" className="ml-1">5 free generations</Badge> per game. 
-              Sign up for <Badge variant="outline" className="ml-1">20 monthly generations</Badge>!
-            </span>
-            <Badge variant="secondary" className="ml-2">
-              {5 - anonymousGenerations} remaining
-            </Badge>
+          <AlertDescription className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                Get <Badge variant="outline">5 free generations</Badge> per game
+              </div>
+              <div className="flex items-center gap-2">
+                Sign up for <Badge variant="outline">20 monthly generations</Badge> + referral bonuses!
+              </div>
+            </div>
+            <div className="flex gap-4">
+              <Badge variant="secondary">
+                Powerball: {5 - anonymousGenerations.powerball} left
+              </Badge>
+              <Badge variant="secondary">
+                Mega Millions: {5 - anonymousGenerations.megamillions} left
+              </Badge>
+            </div>
           </AlertDescription>
         </Alert>
       )}
