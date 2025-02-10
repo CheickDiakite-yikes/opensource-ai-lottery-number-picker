@@ -251,6 +251,12 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_admin_check: {
+        Args: {
+          user_id: string
+        }
+        Returns: boolean
+      }
       most_common_numbers: {
         Args: {
           game_type_param: string
