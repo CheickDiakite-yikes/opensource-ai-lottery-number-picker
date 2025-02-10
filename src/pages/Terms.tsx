@@ -12,6 +12,18 @@ export const Terms = () => {
           subject to a 10% win-sharing fee payable to BigLotto.ai.
         </p>
         
+        <h2 className="text-xl font-semibold mb-4 mt-8">Generation Limits</h2>
+        <p className="mb-4">
+          Free users are limited to 5 free generations per game type (Powerball and Mega Millions) per month. 
+          Registered users receive 20 monthly generations plus any additional bonus generations earned through 
+          referrals. All generation limits reset at the beginning of each month.
+        </p>
+        <p className="mb-4">
+          Referral bonuses add 10 additional generations to both the referrer and the referred user's 
+          monthly allowance. These bonus generations stack with your base monthly limit and carry over 
+          to subsequent months.
+        </p>
+        
         <h2 className="text-xl font-semibold mb-4 mt-8">Service Usage</h2>
         <p className="mb-4">
           Our AI-powered lottery number generation service is provided "as is" without any guarantees 
