@@ -67,12 +67,14 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <Helmet>
+        <title>BigLotto.ai - AI-Powered Lottery Number Generator</title>
+        <meta name="description" content="Generate smarter lottery numbers using AI. Get predictions for Powerball and Mega Millions with advanced analytics and win tracking." />
         <script type="application/ld+json">
           {JSON.stringify(structuredData)}
         </script>
       </Helmet>
       <Navbar />
-      <div className="px-4 sm:px-6 md:px-8 py-12">
+      <div className="px-4 sm:px-6 md:px-8 py-8 sm:py-12">
         <div className="max-w-6xl mx-auto">
           <AnimatePresence mode="wait">
             {recentWinningNumbers && recentWinningNumbers.length > 0 && (
@@ -91,11 +93,11 @@ const Index = () => {
           />
 
           {!session?.user && (
-            <div className="mt-12 bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-100">
-              <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+            <div className="mt-8 sm:mt-12 bg-white/80 backdrop-blur-sm p-4 sm:p-6 rounded-2xl shadow-lg border border-gray-100">
+              <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-3 sm:mb-4">
                 Join Our Community & Get More Free Generations!
               </h2>
-              <p className="text-gray-600">
+              <p className="text-sm sm:text-base text-gray-600">
                 Sign up now and use referral codes to get <span className="font-semibold text-purple-600">10 extra free generations</span>. 
                 Invite your friends and both of you will receive bonus predictions!
               </p>
