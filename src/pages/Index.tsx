@@ -85,14 +85,26 @@ const Index = () => {
             monthlyGenerations={monthlyGenerations} 
           />
 
-          {session?.user && (
-            <ReferralSection userId={session.user.id} />
-          )}
-
           <LotterySection 
             session={session} 
             monthlyGenerations={monthlyGenerations} 
           />
+
+          {!session?.user && (
+            <div className="mt-12 bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-100">
+              <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+                Join Our Community & Get More Free Generations!
+              </h2>
+              <p className="text-gray-600">
+                Sign up now and use referral codes to get <span className="font-semibold text-purple-600">10 extra free generations</span>. 
+                Invite your friends and both of you will receive bonus predictions!
+              </p>
+            </div>
+          )}
+
+          {session?.user && (
+            <ReferralSection userId={session.user.id} />
+          )}
         </div>
       </div>
     </div>
