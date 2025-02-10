@@ -64,17 +64,21 @@ export const generateLotteryNumbers = async (
   const fingerprint = await getFingerprint();
   
   try {
-    // Check if anonymous user can generate using rpc instead of direct table access
-    const { data: canGenerate, error: checkError } = await supabase
-      .rpc('can_generate_anonymous', { fingerprint_param: fingerprint });
+    // For anonymous users only
+    if (!supabase.auth.getUser()) {
+      const { data: canGenerate, error: checkError } = await supabase
+        .rpc('can_generate_anonymous', { fingerprint_param: fingerprint });
 
-    if (checkError) {
-      console.error("Error checking generation limit:", checkError);
-      throw checkError;
-    }
+      if (checkError) {
+        console.error("Error checking generation limit:", checkError);
+        throw checkError;
+      }
 
-    if (!canGenerate) {
-      throw new Error("You've reached your monthly limit of 5 generations. Sign up for 20 generations per month!");
+      if (!canGenerate) {
+        throw new Error("You've reached your monthly limit of 5 generations. Sign up for 20 generations per month!");
+      }
+
+      await incrementAnonymousGenerations(fingerprint);
     }
 
     const prompt = `Generate ${
@@ -95,8 +99,6 @@ export const generateLotteryNumbers = async (
     if (!data || !data.generatedText) {
       throw new Error("Failed to generate numbers");
     }
-
-    await incrementAnonymousGenerations(fingerprint);
     
     const numbers = JSON.parse(data.generatedText);
     return numbers;

@@ -36,8 +36,9 @@ export const LotterySection = ({ session, monthlyGenerations }: LotterySectionPr
   const handleGenerate = async (type: "powerball" | "megamillions") => {
     try {
       console.log("Is admin status:", isAdmin); // Debug log
-      // For authenticated users, check monthly limit (skip for admins)
-      if (session?.user && !isAdmin) {
+      
+      // Skip limit check for admin users
+      if (!session?.user || (!isAdmin && monthlyGenerations)) {
         const totalAllowedGenerations = 20 + (monthlyGenerations?.referral_bonus_generations || 0);
         if (monthlyGenerations?.monthly_generations >= totalAllowedGenerations) {
           toast({
@@ -80,7 +81,7 @@ export const LotterySection = ({ session, monthlyGenerations }: LotterySectionPr
       return numbers;
     } catch (error: any) {
       toast({
-        title: "Generation Limit Reached",
+        title: "Error",
         description: error.message,
         variant: "destructive",
       });
