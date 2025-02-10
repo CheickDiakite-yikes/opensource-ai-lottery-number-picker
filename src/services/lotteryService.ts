@@ -24,20 +24,24 @@ Return ONLY the numbers in an array format [n1,n2,n3,n4,n5,special].`;
 
 const incrementAnonymousGenerations = async (fingerprint: string) => {
   try {
+    // First select the current record to get the current monthly_generations value
+    const { data: currentRecord } = await supabase
+      .from('anonymous_generations')
+      .select('monthly_generations')
+      .eq('fingerprint', fingerprint)
+      .single();
+
+    const newMonthlyGenerations = (currentRecord?.monthly_generations || 0) + 1;
+
+    // Then perform the upsert
     const { data, error } = await supabase
       .from('anonymous_generations')
-      .upsert(
-        { 
-          fingerprint, 
-          monthly_generations: 1 
-        },
-        { 
-          onConflict: 'fingerprint',
-          update: {
-            monthly_generations: supabase.raw('monthly_generations + 1')
-          }
-        }
-      );
+      .upsert({
+        fingerprint,
+        monthly_generations: newMonthlyGenerations,
+      }, {
+        onConflict: 'fingerprint'
+      });
 
     if (error) {
       console.error("Error incrementing anonymous generations:", error);
