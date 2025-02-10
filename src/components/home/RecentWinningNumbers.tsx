@@ -9,12 +9,12 @@ interface RecentWinningNumbersProps {
     numbers: number[];
     special_number: number;
     draw_date: string;
-  }> | null;
+  }>;
 }
 
 export const RecentWinningNumbers = ({ recentWinningNumbers }: RecentWinningNumbersProps) => {
-  if (!recentWinningNumbers || recentWinningNumbers.length === 0) return null;
-
+  console.log("Rendering RecentWinningNumbers with data:", recentWinningNumbers);
+  
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -35,7 +35,9 @@ export const RecentWinningNumbers = ({ recentWinningNumbers }: RecentWinningNumb
             transition={{ type: "spring", stiffness: 300 }}
           >
             <div className="flex items-center justify-between mb-3 sm:mb-4">
-              <h3 className="text-base sm:text-lg font-semibold capitalize text-gray-800">{draw.game_type}</h3>
+              <h3 className="text-base sm:text-lg font-semibold capitalize text-gray-800">
+                {draw.game_type.toLowerCase() === 'powerball' ? 'Powerball' : 'Mega Millions'}
+              </h3>
               <span className="text-xs sm:text-sm text-gray-500">
                 {format(new Date(draw.draw_date), 'MMM d, yyyy')}
               </span>
@@ -59,7 +61,7 @@ export const RecentWinningNumbers = ({ recentWinningNumbers }: RecentWinningNumb
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.5 }}
                 className={`inline-flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full text-white text-sm sm:text-lg font-semibold shadow-sm ${
-                  draw.game_type.toLowerCase().includes('powerball') ? 'bg-lottery-powerball' : 'bg-lottery-megamillions'
+                  draw.game_type.toLowerCase() === 'powerball' ? 'bg-lottery-powerball' : 'bg-lottery-megamillions'
                 }`}
               >
                 {draw.special_number}
