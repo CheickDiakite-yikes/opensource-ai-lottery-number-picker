@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { getFingerprint } from "./fingerprintService";
 
@@ -36,10 +35,10 @@ const incrementAnonymousGenerations = async (fingerprint: string) => {
       .select();
 
     if (insertError && insertError.code === '23505') { // If record already exists
-      // Update existing record
+      // Update existing record using raw SQL for increment
       const { error: updateError } = await supabase
         .from('anonymous_generations')
-        .update({ monthly_generations: supabase.sql`monthly_generations + 1` })
+        .update({ monthly_generations: `monthly_generations + 1` })
         .eq('fingerprint', fingerprint);
 
       if (updateError) throw updateError;
